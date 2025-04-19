@@ -1,0 +1,307 @@
+<template>
+    <div class="container-fluid d-flex justify-content-center align-items-center vh-100 bg-light">
+      <div class="register-box bg-white p-5 rounded shadow-lg">
+        <div class="text-center mb-4">
+          <h1 class="text-main">Restaurant Kayıt</h1>
+          <p class="text-muted">Restoranınızı Kaydedin</p>
+        </div>
+        <form @submit.prevent="register">
+          <!-- Restaurant Name Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="text" 
+              v-model="restaurant.name" 
+              placeholder="Restaurant Adı" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.name}"
+            />
+            <div v-if="errors.name" class="invalid-feedback">{{ errors.name }}</div>
+          </div>
+  
+          <!-- Phone Number Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="text" 
+              v-model="restaurant.phoneNumber" 
+              placeholder="Telefon Numarası" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.phoneNumber}"
+            />
+            <div v-if="errors.phoneNumber" class="invalid-feedback">{{ errors.phoneNumber }}</div>
+          </div>
+  
+          <!-- Location Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="text" 
+              v-model="restaurant.location" 
+              placeholder="Lokasyon" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.location}"
+            />
+            <div v-if="errors.location" class="invalid-feedback">{{ errors.location }}</div>
+          </div>
+  
+          <!-- Password Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="password" 
+              v-model="restaurant.password" 
+              placeholder="Şifre" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.password}"
+            />
+            <div v-if="errors.password" class="invalid-feedback">{{ errors.password }}</div>
+          </div>
+  
+          <!-- Opening Time Input -->
+          <label for="">Açılış ve Kapanış Saatleri</label>
+          <div class="form-group mb-3">
+            <input 
+              type="time" 
+              v-model="restaurant.openingTime" 
+              placeholder="Açılış Saati" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.openingTime}"
+            />
+            <div v-if="errors.openingTime" class="invalid-feedback">{{ errors.openingTime }}</div>
+          </div>
+  
+          <!-- Closing Time Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="time" 
+              v-model="restaurant.closingTime" 
+              placeholder="Kapanış Saati" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.closingTime}"
+            />
+            <div v-if="errors.closingTime" class="invalid-feedback">{{ errors.closingTime }}</div>
+          </div>
+  
+          <label for="">Profil Resmi</label>
+          <!-- Image Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="file" 
+              @change="onImageChange" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.image}"
+            />
+            <div v-if="errors.image" class="invalid-feedback">{{ errors.image }}</div>
+          </div>
+  
+          <!-- Max Service Distance Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="number" 
+              v-model="restaurant.maxServiceDistance" 
+              placeholder="Maksimum Hizmet Mesafesi (km)" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.maxServiceDistance}"
+            />
+            <div v-if="errors.maxServiceDistance" class="invalid-feedback">{{ errors.maxServiceDistance }}</div>
+          </div>
+  
+          <!-- Min Service Price Per Km Input -->
+          <div class="form-group mb-4">
+            <input 
+              type="number" 
+              v-model="restaurant.minServicePricePerKm" 
+              placeholder="Kilometre Başına Minimum Hizmet Ücreti" 
+              class="form-control form-control-lg border-main"
+              required 
+              :class="{'is-invalid': errors.minServicePricePerKm}"
+            />
+            <div v-if="errors.minServicePricePerKm" class="invalid-feedback">{{ errors.minServicePricePerKm }}</div>
+          </div>
+  
+          <button type="submit" class="btn btn-main btn-lg w-100 mb-3">Kayıt Ol</button>
+        </form>
+        <div class="d-flex justify-content-between">
+          <a href="/login" class="text-dark">Zaten Hesabınız Var mı? Giriş Yap</a>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  import axios from 'axios'
+  export default {
+    data() {
+      return {
+        restaurant: {
+          name: '',
+          phoneNumber: '',
+          location: '',
+          password: '',
+          openingTime: '',
+          closingTime: '',
+          image: null,
+          maxServiceDistance: '',
+          minServicePricePerKm: '',
+        },
+        errors: {
+          name: '',
+          phoneNumber: '',
+          location: '',
+          password: '',
+          openingTime: '',
+          closingTime: '',
+          image: '',
+          maxServiceDistance: '',
+          minServicePricePerKm: '',
+        },
+      };
+    },
+    methods: {
+
+      appendToFormData(obj){
+        const formData = new FormData();
+        for(const key in obj){
+          formData.append(key , obj[key]);
+        }
+        return formData;
+      },
+
+      // Form submit işlemi
+      register() {
+        this.errors = {}; // Hata mesajlarını sıfırla
+        const isValid = this.validateForm();
+        if (!isValid) return;
+  
+        const formData = this.appendToFormData(this.restaurant);
+        axios.post('http://localhost:8080/restaurant/register' , formData).catch( (error) => {
+    console.error("Network Error:", error);
+    // Hata mesajını daha ayrıntılı şekilde loglayın
+        }).then((response) => {
+          console.log("response : " , response);
+        })
+        // Burada API'ye veri gönderilebilir.
+        console.log('Restoran kaydedildi:', this.restaurant);
+        
+        // Yönlendirme veya başka bir işlem yapılabilir
+      },
+  
+
+      // Form doğrulama
+      validateForm() {
+        let isValid = true;
+        if (!this.restaurant.name) {
+          this.errors.name = 'Restoran adı boş bırakılamaz.';
+          isValid = false;
+        }
+        if (!this.restaurant.phoneNumber) {
+          this.errors.phoneNumber = 'Telefon numarası boş bırakılamaz.';
+          isValid = false;
+        }
+        if (!this.restaurant.location) {
+          this.errors.location = 'Lokasyon boş bırakılamaz.';
+          isValid = false;
+        }
+        if (!this.restaurant.password) {
+          this.errors.password = 'Şifre boş bırakılamaz.';
+          isValid = false;
+        }
+        if (!this.restaurant.openingTime) {
+          this.errors.openingTime = 'Açılış saati boş bırakılamaz.';
+          isValid = false;
+        }
+        if (!this.restaurant.closingTime) {
+          this.errors.closingTime = 'Kapanış saati boş bırakılamaz.';
+          isValid = false;
+        }
+        if (!this.restaurant.image) {
+          this.errors.image = 'Resim seçilmelidir.';
+          isValid = false;
+        }
+        if (!this.restaurant.maxServiceDistance || this.restaurant.maxServiceDistance < 1) {
+          this.errors.maxServiceDistance = 'Maksimum hizmet mesafesi en az 1 km olmalıdır.';
+          isValid = false;
+        }
+        if (!this.restaurant.minServicePricePerKm || this.restaurant.minServicePricePerKm < 0) {
+          this.errors.minServicePricePerKm = 'Minimum hizmet ücreti sıfırdan küçük olamaz.';
+          isValid = false;
+        }
+        return isValid;
+      },
+  
+      // Resim seçimi
+      onImageChange(event) {
+        this.restaurant.image = event.target.files[0];
+      },
+    },
+  };
+  </script>
+  
+  <style scoped>
+  .bg-light {
+    background-color: #FFFBF0; /* Açık Krem */
+  }
+  
+  .register-box {
+    max-width: 450px;
+    width: 100%;
+  }
+  
+  h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #FF9F00; /* Turuncu */
+  }
+  
+  .text-main {
+    color: #FF9F00 !important; /* Turuncu */
+  }
+  
+  .text-muted {
+    color: #666666;
+  }
+  
+  .form-control {
+    font-size: 1.1em;
+    padding: 12px;
+    border-radius: 10px;
+    border-color: #FF9F00;
+  }
+  
+  .form-control:focus {
+    border-color: #FF9F00;
+    box-shadow: 0 0 5px rgba(255, 159, 0, 0.5); /* Turuncu */
+  }
+  
+  .btn-main {
+    background-color: #FF9F00; /* Turuncu */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+  }
+  
+  .btn-main:hover {
+    background-color: #FF7F00; /* Koyu Turuncu */
+    box-shadow: 0 0 10px rgba(255, 159, 0, 0.7);
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  a:hover {
+    color: #FF9F00;
+  }
+  
+  /* Hata Mesajları */
+  .invalid-feedback {
+    color: red;
+  }
+  </style>
+  
