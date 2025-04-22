@@ -10,7 +10,7 @@
           <div class="form-group mb-4">
             <input 
               type="text" 
-              v-model="username" 
+              v-model="phoneNumber" 
               placeholder="Telefon Numarası" 
               class="form-control form-control-lg border-main"
               required 
@@ -35,21 +35,22 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    data() {
-      return {
-        username: '',
-        password: ''
-      };
-    },
-    methods: {
-      login() {
-        // Giriş işlemleri yapılacak
-        console.log("Giriş yapılıyor...");
-      }
-    }
-  };
+  <script setup>
+import axios from 'axios'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+  let phoneNumber = ref("");
+  let password = ref("");
+  let router = useRouter();
+
+  function login(){
+    axios.post("/api/login", {phoneNumber : phoneNumber.value , password : password.value }).then((res) => {
+          console.log(res);
+          if(res.data.success){
+            router.push("/restaurant-list")
+          }
+        })
+  }
   </script>
   
   <style scoped>

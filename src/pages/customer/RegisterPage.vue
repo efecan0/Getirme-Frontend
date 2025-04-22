@@ -80,68 +80,83 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    data() {
-      return {
-        customer: {
-          name: '',
-          surname: '',
-          phoneNumber: '',
-          location: '',
-          password: '',
-        },
-        errors: {
-          name: '',
-          surname: '',
-          phoneNumber: '',
-          location: '',
-          password: '',
-        },
-      };
-    },
-    methods: {
-      // Form submit işlemi
-      register() {
-        this.errors = {}; // Hata mesajlarını sıfırla
-        const isValid = this.validateForm();
-        if (!isValid) return;
-  
-        // Burada API'ye veri gönderilebilir.
-        console.log('Kullanıcı kaydedildi:', this.customer);
-        // Yönlendirme veya başka bir işlem yapılabilir
-      },
-  
-      // Form doğrulama
-      validateForm() {
-        let isValid = true;
-        if (!this.customer.name || this.customer.name.length < 2 || this.customer.name.length > 50) {
-          this.errors.name = 'Ad 2-50 karakter arasında olmalıdır.';
-          isValid = false;
-        }
-        if (!this.customer.surname || this.customer.surname.length < 2 || this.customer.surname.length > 50) {
-          this.errors.surname = 'Soyad 2-50 karakter arasında olmalıdır.';
-          isValid = false;
-        }
-        const phonePattern = /^5[0-9]{9}$/;
-        if (!phonePattern.test(this.customer.phoneNumber)) {
-          this.errors.phoneNumber = 'Telefon numarası 10 haneli ve 5 ile başlamalıdır.';
-          isValid = false;
-        }
-        if (!this.customer.location) {
-          this.errors.location = 'Lokasyon boş bırakılamaz.';
-          isValid = false;
-        }
-        const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-        if (!passwordPattern.test(this.customer.password)) {
-          this.errors.password = 'Şifre en az 8 karakter olmalı, 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir.';
-          isValid = false;
-        }
-        return isValid;
-      },
-    },
-  };
-  </script>
+  <script setup>
+import { reactive } from 'vue'
+import axios from 'axios'
+import {useRouter} from 'vue-router'
+
+let router = useRouter();
+
+const customer = reactive({
+  name: '',
+  surname: '',
+  phoneNumber: '',
+  location: '',
+  password: '',
+})
+
+const errors = reactive({
+  name: '',
+  surname: '',
+  phoneNumber: '',
+  location: '',
+  password: '',
+})
+
+const validateForm = () => {
+  let isValid = true
+  errors.name = ''
+  errors.surname = ''
+  errors.phoneNumber = ''
+  errors.location = ''
+  errors.password = ''
+
+  if (!customer.name || customer.name.length < 2 || customer.name.length > 50) {
+    errors.name = 'Ad 2-50 karakter arasında olmalıdır.'
+    isValid = false
+  }
+  if (!customer.surname || customer.surname.length < 2 || customer.surname.length > 50) {
+    errors.surname = 'Soyad 2-50 karakter arasında olmalıdır.'
+    isValid = false
+  }
+
+  const phonePattern = /^5[0-9]{9}$/
+  if (!phonePattern.test(customer.phoneNumber)) {
+    errors.phoneNumber = 'Telefon numarası 10 haneli ve 5 ile başlamalıdır.'
+    isValid = false
+  }
+
+  if (!customer.location) {
+    errors.location = 'Lokasyon boş bırakılamaz.'
+    isValid = false
+  }
+
+  const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/
+  if (!passwordPattern.test(customer.password)) {
+    errors.password = 'Şifre en az 8 karakter olmalı, 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir.'
+    isValid = false
+  }
+
+  return isValid
+}
+
+const register = async () => {
+  Object.keys(errors).forEach(key => errors[key] = '') // Hataları sıfırla
+  if (!validateForm()) return
+
+  try {
+    const res = await axios.post("/api/customer/register", customer)
+    console.log(res)
+    if(res.data.success){
+      router.push("/login");
+    }
+  } catch (err) {
+    console.error("Kayıt sırasında bir hata oluştu:", err)
+  }
+
+}
+</script>
+
   
   <style scoped>
   .bg-light {

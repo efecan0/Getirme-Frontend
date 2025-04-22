@@ -11,11 +11,13 @@
     "axios": "^1.8.4",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
+    "vue-cookies": "^1.8.6",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@babel/plugin-transform-class-static-block": "^7.26.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",

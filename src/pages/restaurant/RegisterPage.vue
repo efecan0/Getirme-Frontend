@@ -133,114 +133,125 @@
     </div>
   </template>
   
-  <script>
-  import axios from 'axios'
-  export default {
-    data() {
-      return {
-        restaurant: {
-          name: '',
-          phoneNumber: '',
-          location: '',
-          password: '',
-          openingTime: '',
-          closingTime: '',
-          image: null,
-          maxServiceDistance: '',
-          minServicePricePerKm: '',
-        },
-        errors: {
-          name: '',
-          phoneNumber: '',
-          location: '',
-          password: '',
-          openingTime: '',
-          closingTime: '',
-          image: '',
-          maxServiceDistance: '',
-          minServicePricePerKm: '',
-        },
-      };
-    },
-    methods: {
+  <script setup>
+import { ref } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 
-      appendToFormData(obj){
-        const formData = new FormData();
-        for(const key in obj){
-          formData.append(key , obj[key]);
-        }
-        return formData;
-      },
+const router = useRouter()
 
-      // Form submit işlemi
-      register() {
-        this.errors = {}; // Hata mesajlarını sıfırla
-        const isValid = this.validateForm();
-        if (!isValid) return;
-  
-        const formData = this.appendToFormData(this.restaurant);
-        axios.post('http://localhost:8080/restaurant/register' , formData).catch( (error) => {
-    console.error("Network Error:", error);
-    // Hata mesajını daha ayrıntılı şekilde loglayın
-        }).then((response) => {
-          console.log("response : " , response);
-        })
-        // Burada API'ye veri gönderilebilir.
-        console.log('Restoran kaydedildi:', this.restaurant);
-        
-        // Yönlendirme veya başka bir işlem yapılabilir
-      },
-  
+const restaurant = ref({
+  name: '',
+  phoneNumber: '',
+  location: '',
+  password: '',
+  openingTime: '',
+  closingTime: '',
+  image: null,
+  maxServiceDistance: '',
+  minServicePricePerKm: '',
+})
 
-      // Form doğrulama
-      validateForm() {
-        let isValid = true;
-        if (!this.restaurant.name) {
-          this.errors.name = 'Restoran adı boş bırakılamaz.';
-          isValid = false;
-        }
-        if (!this.restaurant.phoneNumber) {
-          this.errors.phoneNumber = 'Telefon numarası boş bırakılamaz.';
-          isValid = false;
-        }
-        if (!this.restaurant.location) {
-          this.errors.location = 'Lokasyon boş bırakılamaz.';
-          isValid = false;
-        }
-        if (!this.restaurant.password) {
-          this.errors.password = 'Şifre boş bırakılamaz.';
-          isValid = false;
-        }
-        if (!this.restaurant.openingTime) {
-          this.errors.openingTime = 'Açılış saati boş bırakılamaz.';
-          isValid = false;
-        }
-        if (!this.restaurant.closingTime) {
-          this.errors.closingTime = 'Kapanış saati boş bırakılamaz.';
-          isValid = false;
-        }
-        if (!this.restaurant.image) {
-          this.errors.image = 'Resim seçilmelidir.';
-          isValid = false;
-        }
-        if (!this.restaurant.maxServiceDistance || this.restaurant.maxServiceDistance < 1) {
-          this.errors.maxServiceDistance = 'Maksimum hizmet mesafesi en az 1 km olmalıdır.';
-          isValid = false;
-        }
-        if (!this.restaurant.minServicePricePerKm || this.restaurant.minServicePricePerKm < 0) {
-          this.errors.minServicePricePerKm = 'Minimum hizmet ücreti sıfırdan küçük olamaz.';
-          isValid = false;
-        }
-        return isValid;
-      },
-  
-      // Resim seçimi
-      onImageChange(event) {
-        this.restaurant.image = event.target.files[0];
-      },
-    },
-  };
-  </script>
+const errors = ref({
+  name: '',
+  phoneNumber: '',
+  location: '',
+  password: '',
+  openingTime: '',
+  closingTime: '',
+  image: '',
+  maxServiceDistance: '',
+  minServicePricePerKm: '',
+})
+
+function appendToFormData(obj) {
+  const formData = new FormData()
+  for (const key in obj) {
+    formData.append(key, obj[key])
+  }
+  return formData;
+}
+
+function validateForm() {
+  let isValid = true
+  errors.value = {
+    name: '',
+    phoneNumber: '',
+    location: '',
+    password: '',
+    openingTime: '',
+    closingTime: '',
+    image: '',
+    maxServiceDistance: '',
+    minServicePricePerKm: '',
+  }
+
+  if (!restaurant.value.name) {
+    errors.value.name = 'Restoran adı boş bırakılamaz.'
+    isValid = false
+  }
+  if (!restaurant.value.phoneNumber) {
+    errors.value.phoneNumber = 'Telefon numarası boş bırakılamaz.'
+    isValid = false
+  }
+  if (!restaurant.value.location) {
+    errors.value.location = 'Lokasyon boş bırakılamaz.'
+    isValid = false
+  }
+  if (!restaurant.value.password) {
+    errors.value.password = 'Şifre boş bırakılamaz.'
+    isValid = false
+  }
+  if (!restaurant.value.openingTime) {
+    errors.value.openingTime = 'Açılış saati boş bırakılamaz.'
+    isValid = false
+  }
+  if (!restaurant.value.closingTime) {
+    errors.value.closingTime = 'Kapanış saati boş bırakılamaz.'
+    isValid = false
+  }
+  if (!restaurant.value.image) {
+    errors.value.image = 'Resim seçilmelidir.'
+    isValid = false
+  }
+  if (!restaurant.value.maxServiceDistance || restaurant.value.maxServiceDistance < 1) {
+    errors.value.maxServiceDistance = 'Maksimum hizmet mesafesi en az 1 km olmalıdır.'
+    isValid = false
+  }
+  if (!restaurant.value.minServicePricePerKm || restaurant.value.minServicePricePerKm < 0) {
+    errors.value.minServicePricePerKm = 'Minimum hizmet ücreti sıfırdan küçük olamaz.'
+    isValid = false
+  }
+
+  return isValid
+}
+
+function onImageChange(event) {
+  restaurant.value.image = event.target.files[0]
+}
+
+function register() {
+  errors.value = {}
+  const isValid = validateForm()
+  if (!isValid) return
+
+  const formData = appendToFormData(restaurant.value)
+
+  axios.post('/api/restaurant/register', formData)
+    .then((response) => {
+      console.log("response: ", response)
+      if (response.data.success) {
+        router.push("/login");
+      }
+    })
+    .catch((error) => {
+      console.error("Network Error:", error)
+    })
+
+  console.log('Restoran kaydedildi:', restaurant.value)
+}
+</script>
+
   
   <style scoped>
   .bg-light {
