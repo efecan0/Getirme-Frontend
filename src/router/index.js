@@ -4,6 +4,8 @@ import CustomerRegisterPage from '../pages/customer/RegisterPage.vue';
 import RestaurantRegisterPage from '../pages/restaurant/RegisterPage.vue';
 import CreateProductPage from '../pages/restaurant/CreateProductPage.vue';
 import RestaurantListPage from '../pages/RestaurantListPage.vue';
+import RestaurantId from '../pages/restaurant/details/[restaurantId].vue';
+import ProductId from '../pages/restaurant/products/[productId].vue';
 
 const routes = [
   {
@@ -35,6 +37,16 @@ const routes = [
     path: '/restaurant-list',
     name: 'restaurant-list',
     component: RestaurantListPage,  
+  },
+  {
+    path: '/restaurant/details/:restaurantId',
+    name: 'restaurant-details',
+    component: RestaurantId,  
+  },
+  {
+    path: '/restaurant/products/:productId',
+    name: 'restaurant-product-details',
+    component: ProductId,  
   },
 ];
 
