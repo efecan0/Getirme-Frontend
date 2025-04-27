@@ -39,14 +39,17 @@
 import axios from 'axios'
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
+const authStore = useAuthStore();
+
   let phoneNumber = ref("");
   let password = ref("");
   let router = useRouter();
 
   function login(){
-    axios.post("/api/login", {phoneNumber : phoneNumber.value , password : password.value }).then((res) => {
-          console.log(res);
+    axios.post("/api/login", {phoneNumber : phoneNumber.value , password : password.value }).then(async (res) => {
           if(res.data.success){
+            await authStore.checkAuth();
             router.push("/restaurant-list")
           }
         })
