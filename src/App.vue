@@ -1,13 +1,12 @@
 <template>
 <div id="app">
+  <Navbar />
   <router-view></router-view>
 </div>
 </template>
 
-<script>
-export default {
-  name: 'App',
-};
+<script setup>
+import Navbar from '@/components/NavBar.vue'; // doğru yolu kontrol et
 </script>
 
 <style>
@@ -17,6 +16,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
