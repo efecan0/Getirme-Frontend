@@ -10,6 +10,9 @@ import CartPage from '../pages/CartPage.vue';
 import MyOrdersPage from '@/pages/MyOrdersPage.vue';
 import OrderDetailsPage from '../pages/OrderDetailsPage.vue';
 import RestaurantOrdersPage from '@/pages/RestaurantOrdersPage.vue';
+import UpdateRestaurantProfilePage from '@/pages/restaurant/UpdateProfilePage.vue';
+import UpdateCustomerProfilePage from '@/pages/customer/UpdateProfilePage.vue';
+import EditProductPage from '@/pages/restaurant/products/edit/[productId].vue'
 import axios from 'axios';
 
 
@@ -74,7 +77,21 @@ const routes = [
     name: 'restaurant-order',
     component: RestaurantOrdersPage,
   },
-
+  {
+    path: '/restaurant/update',
+    name: 'restaurant-update',
+    component: UpdateRestaurantProfilePage,
+  },
+  {
+    path: '/customer/update',
+    name: 'customer-update',
+    component: UpdateCustomerProfilePage,
+  },
+  {
+    path: '/restaurant/products/edit/:productId',
+    name: 'restaurant-product-edit',
+    component: EditProductPage,
+  },
   
 ];
 

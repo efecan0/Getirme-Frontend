@@ -23,6 +23,27 @@
             </router-link>
           </li>
 
+
+          <li class="nav-item" v-if="userType=='RESTAURANT'">
+            <router-link class="nav-link text-white fw-bold" to="/restaurant/update">
+              <i class="bi bi-person-circle"></i> Profil
+            </router-link>
+          </li>
+
+          <li class="nav-item" v-if="userType=='CUSTOMER'">
+            <router-link class="nav-link text-white fw-bold" to="/customer/update">
+              <i class="bi bi-person-circle"></i> Profil
+            </router-link>
+          </li>
+
+          <li class="nav-item" v-if="userType=='RESTAURANT'">
+            <router-link class="nav-link text-white fw-bold" to="/restaurant/create-product">
+              <i class="bi bi-plus-circle"></i> Ürün Oluştur
+            </router-link>
+          </li>
+
+          
+
           <!-- Siparişlerim -->
           <li class="nav-item" v-if="userType=='CUSTOMER'">
             <router-link class="nav-link text-white fw-bold" to="/my-orders">
