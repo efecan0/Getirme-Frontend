@@ -12,7 +12,9 @@
 
     <div v-else class="row g-4">
       <div v-for="order in activeOrders" :key="order.id" class="col-12">
-        <div class="card shadow-sm order-card">
+        <div class="card shadow-sm order-card"
+        style="cursor: pointer;"
+        @click="goToOrderDetails(order.id)">
           <div class="card-body">
 
             <h5 class="fw-bold text-warning">Sipariş ID: #{{ order.id }}</h5>
@@ -50,7 +52,7 @@
                 v-for="status in availableStatuses"
                 :key="status"
                 class="btn btn-sm btn-outline-warning fw-bold"
-                @click="updateOrderStatus(order.id, status)"
+                @click.stop="updateOrderStatus(order.id, status)"
               >
                 {{ statusText(status) }}
               </button>
@@ -69,6 +71,12 @@ import { ref, onMounted, computed, onUnmounted } from 'vue';
 import axios from 'axios';
 import ToastNotification from '@/components/ToastNotification.vue';
 import { connectWebSocket, sendOrderStatusUpdate, disconnectWebSocket } from '@/webSocketClient';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const goToOrderDetails = (orderId) => {
+  router.push({ name: 'order-details', params: { orderId } });
+};
 
 const orders = ref([]);
 const availableStatuses = ['PREPARING', 'ON_THE_WAY', 'DELIVERED', 'CANCELLED']; 
