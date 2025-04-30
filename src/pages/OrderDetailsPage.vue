@@ -7,7 +7,6 @@
           ✅ Sipariş Teslim Edildi
         </template>
         <template v-else>
-          ⏳ Tahmini Teslimat: {{ calculateEstimatedDeliveryTime(order.restaurant.distance) }} dakika
         </template>
       </div>
   
@@ -96,12 +95,10 @@
   const orderId = route.params.orderId;
   const order = ref(null);
   const orderStatus = ref('');
-  const weatherInfo = ref(null);
-  const userLocation = ref(null);
+
   
   onMounted(async () => {
     await fetchOrder();
-    await fetchUserLocation();
     connectWebSocket(onStatusUpdateReceived);
   });
   
@@ -120,72 +117,7 @@
       console.error('Sipariş detayı alınamadı:', error);
     }
   };
-  
-  const fetchUserLocation = async () => {
-    try {
-      const response = await axios.get('/api/customer/location', { withCredentials: true });
-      if (response.data) {
-        userLocation.value = response.data.data;
-        fetchWeather();
-      }
-    } catch (error) {
-      console.error('Konum alınamadı:', error);
-    }
-  };
-  
-  const fetchWeather = async () => {
-    if (!userLocation.value) return;
-
-    const apiKey = process.env.VUE_APP_OPENWEATHERMAP_API_KEY;
-    const lat = userLocation.value.latitude;
-    const lon = userLocation.value.longitude;
-  
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
-  
-    try {
-      const response = await axios.get(url);
-      weatherInfo.value = response.data;
-    } catch (error) {
-      console.error('Hava durumu alınamadı:', error);
-    }
-  };
-  
-  const calculateEstimatedDeliveryTime = (distanceKm) => {
     
-    if (!distanceKm || isNaN(distanceKm)) return 0;
-  
-    let averageSpeedKmH = 30;
-    let travelMinutes = Math.round((distanceKm / averageSpeedKmH) * 60);
-  
-    if (weatherInfo.value && weatherInfo.value.weather) {
-      const weatherMain = weatherInfo.value.weather[0].main;
-      if (['Rain', 'Drizzle', 'Thunderstorm'].includes(weatherMain)) {
-        travelMinutes += 10;
-      }
-    }
-  
-    if (weatherInfo.value && weatherInfo.value.wind && weatherInfo.value.wind.speed > 5) {
-      travelMinutes += 5;
-    }
-  
-    let trafficFactor = 1.0;
-  
-    if (weatherInfo.value) {
-      if (weatherInfo.value.wind && weatherInfo.value.wind.speed > 7) {
-        trafficFactor = 1.5;
-      } else if (weatherInfo.value.visibility && weatherInfo.value.visibility < 5000) {
-        trafficFactor = 1.4;
-      } else if (weatherInfo.value.clouds && weatherInfo.value.clouds.all > 80) {
-        trafficFactor = 1.2;
-      }
-    }
-  
-    travelMinutes = Math.round(travelMinutes * trafficFactor);
-  
-    
-    return travelMinutes;
-  };
-  
   const estimateCarbonFootprint = (distanceKm) => {
     const carbonPerKm = 50;
     const totalCarbon = distanceKm * carbonPerKm;

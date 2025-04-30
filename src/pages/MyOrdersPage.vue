@@ -34,14 +34,24 @@
                 </div>
                 </div>
 
-  
                 <div v-if="order.status === 'ON_THE_WAY'" class="alert alert-primary p-2 text-center fw-bold">
-                  🚚 Yolda! Tahmini Teslim: {{ calculateEstimatedDeliveryTime(order.restaurant.distance) }} dk kaldı
+                  <template v-if="getLiveRemainingTime(order) > 0">
+                    🚚 Yolda! Tahmini Teslim: {{ getLiveRemainingTime(order) }} dk kaldı
+                  </template>
+                  <template v-else>
+                    {{ getDelayMessage(order) }}
+                  </template>
                 </div>
-  
+
                 <div v-else-if="order.status === 'PREPARING'" class="alert alert-warning p-2 text-center fw-bold">
-                  👨‍🍳 Hazırlanıyor! Tahmini Teslim: {{ calculateEstimatedDeliveryTime(order.restaurant.distance) + 5 }} dk
+                  <template v-if="getLiveRemainingTime(order) > 0">
+                    👨‍🍳 Hazırlanıyor! Tahmini Teslim: {{ getLiveRemainingTime(order) }} dk kaldı
+                  </template>
+                  <template v-else>
+                    {{ getDelayMessage(order) }}
+                  </template>
                 </div>
+
   
                 <div v-else-if="order.status === 'DELIVERED'" class="alert alert-success p-2 text-center fw-bold">
                   ✅ Teslim Edildi!
@@ -164,6 +174,8 @@ const calculateEstimatedDeliveryTime = (distanceKm) => {
 const goToOrderDetails = (orderId) => {
   router.push({ name: 'order-details', params: { orderId } });
 };
+
+
   
   const statusText = (status) => {
     switch (status) {
@@ -216,6 +228,58 @@ const goToOrderDetails = (orderId) => {
     orders.value.push(update);
   }
 };
+
+const getLiveRemainingTime = (order) => {
+  const createdAt = new Date(order.date); // Sipariş oluşturulma zamanı
+  const now = new Date();
+
+  const diffMs = now - createdAt;
+  const elapsedMinutes = Math.floor(diffMs / 60000); // milisaniyeyi dakikaya çevir
+
+  let estimatedMinutes = 0;
+
+  if (order.status === 'ON_THE_WAY') {
+    estimatedMinutes = calculateEstimatedDeliveryTime(order.restaurant.distance);
+  } else if (order.status === 'PREPARING') {
+    estimatedMinutes = calculateEstimatedDeliveryTime(order.restaurant.distance) + 5;
+  } else {
+    return null; // bu statüler için süre gösterme
+  }
+
+  const remaining = estimatedMinutes - elapsedMinutes;
+  return remaining;
+};
+
+const getDelayMessage = (order) => {
+  const createdAt = new Date(order.date);
+  const now = new Date();
+
+  const elapsedMinutes = Math.floor((now - createdAt) / 60000);
+  let estimated = 0;
+
+  if (order.status === 'ON_THE_WAY') {
+    estimated = calculateEstimatedDeliveryTime(order.restaurant.distance);
+  } else if (order.status === 'PREPARING') {
+    estimated = calculateEstimatedDeliveryTime(order.restaurant.distance) + 5;
+  } else {
+    return null;
+  }
+
+  const delay = elapsedMinutes - estimated;
+
+  if (delay <= 0) return null; // gecikme yok
+
+  if (delay < 5) {
+    return `Tahmini süreyi azıcık aştık 🙏 Siparişiniz çok yakında!`;
+  } else if (delay < 10) {
+    return `Tahmini süreyi geçtik 😅 Lütfen 5-10 dakika içinde kapınızda olacak!`;
+  } else if (delay < 20) {
+    return `Gecikme için özür dileriz 😔 Kurye yolda, en kısa sürede orada olacak.`;
+  } else {
+    return `⚠️ Sipariş ciddi şekilde gecikti, destek ekibimizle iletişime geçebilirsiniz.`;
+  }
+};
+
 
 
 onMounted(() => {
