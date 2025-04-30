@@ -82,13 +82,13 @@ const product = ref(null);
 const selectableContent = ref([]);
 const quantity = ref(1); // Adet bilgisi
 const selectedOptions = ref({});
-
 onMounted(async () => {
   try {
     const response = await axios.get(`/api/restaurant/product/details/${productId}`, { withCredentials: true });
     if (response.data.success) {
       product.value = response.data.data.product;
       selectableContent.value = response.data.data.selectableContent;
+      console.log(product.value)
     }
   } catch (error) {
     console.error('Ürün detayı hatası:', error);
@@ -137,6 +137,13 @@ const addToCart = () => {
     });
   }
 
+  let totalPrice = 0;
+  for(let index in selectedOptions.value){
+    totalPrice += selectedOptions.value[index][0].price * quantity.value
+  }
+  
+  totalPrice += quantity.value * product.value.price;
+
   cartStore.addProduct({
     image: product.value.image,
     restaurantId: Number(restaurantId),
@@ -144,6 +151,7 @@ const addToCart = () => {
     size: quantity.value, // Adet
     selectableContentMap,
     selectableContentNames,
+    price : totalPrice
   });
 
   router.push('/cart');

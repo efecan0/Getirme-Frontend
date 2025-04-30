@@ -33,7 +33,6 @@
             <div class="flex-grow-1 p-2">
               <h5 class="fw-bold mb-1">Ürün ID: {{ product.productId }}</h5> 
               <small class="text-muted">Boyut: {{ product.size }}</small>
-
               <!-- Seçilen İçerikler -->
               <div class="mt-2 small">
                 <div v-for="(content, idx) in product.selectableContentNames" :key="idx">
@@ -43,7 +42,7 @@
                 </div>
               </div>
             </div>
-
+            <span class="me-2"><strong>{{ product.price }} TL</strong></span>
             <!-- Sil Butonu -->
             <div class="p-2">
               <button @click="removeProduct(index)" class="btn btn-sm btn-outline-danger">
@@ -60,9 +59,8 @@
         <button class="btn btn-outline-danger fw-bold" @click="clearCart">
           <i class="bi bi-trash-fill"></i> Sepeti Temizle
         </button>
-
         <button class="btn btn-warning fw-bold" @click="createOrder">
-          <i class="bi bi-bag-check-fill"></i> Siparişi Tamamla
+          <i class="bi bi-bag-check-fill"></i> Siparişi Tamamla ({{ totalPrice }} TL)
         </button>
       </div>
 
@@ -74,6 +72,7 @@
 <script setup>
 import { useCartStore } from '@/store/cart';
 import axios from 'axios';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const cartStore = useCartStore();
@@ -86,6 +85,17 @@ const removeProduct = (index) => {
 const clearCart = () => {
   cartStore.clearCart();
 };
+
+console.log(cartStore.products)
+
+let totalPrice = computed(() => {
+  let sum = 0;
+  for(let index in cartStore.products){
+    sum += cartStore.products[index].price;
+  }
+  return sum;
+})
+
 
 const createOrder = async () => {
   try {

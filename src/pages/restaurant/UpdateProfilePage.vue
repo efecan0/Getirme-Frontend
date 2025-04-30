@@ -260,8 +260,8 @@
         console.log(data)
         Object.assign(restaurant.value, data.restaurant)
         Object.assign(products.value , data.products)
-        restaurant.value.maxServiceDistance = data.distance
-        restaurant.value.minServicePricePerKm = data.minServicePrice
+        restaurant.value.maxServiceDistance = data.restaurant.distance
+        restaurant.value.minServicePricePerKm = data.restaurant.minServicePrice
         } catch (error) {
         console.error("Veri Çekme Hatası:", error)
         }

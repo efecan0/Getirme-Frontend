@@ -28,7 +28,7 @@
           <button type="submit" class="btn btn-main btn-lg w-100 mb-4">Giriş Yap</button>
           <div class="d-flex justify-content-between">
             <a href="#" class="text-dark">Şifremi Unuttum</a>
-            <a href="#" class="text-dark">Hesabınız Yok Mu? Kayıt Ol</a>
+            <a href="/register" class="text-dark">Hesabınız Yok Mu? Kayıt Ol</a>
           </div>
         </form>
       </div>

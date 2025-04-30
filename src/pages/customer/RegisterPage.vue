@@ -75,7 +75,13 @@
         </form>
         <div class="d-flex justify-content-between">
           <a href="/login" class="text-dark">Zaten Hesabınız Var mı? Giriş Yap</a>
+          
         </div>
+        <div class="d-flex justify-content-between mt-3">
+          <a href="/restaurant/register" class="text-dark">Restaurant mısınız? Kayıt Ol</a>
+          
+        </div>
+        
       </div>
     </div>
   </template>
