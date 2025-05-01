@@ -60,12 +60,14 @@
             </div>
   
             <div class="d-flex justify-content-center ">
+                <div @click="deleteProduct" class="btn btn-danger mt-3 mx-1">Ürünü Sil</div>
                 <button type="submit" class="btn btn-success mt-3 mx-1">Ürünü Güncelle</button>
             </div>
             
           </form>
         </div>
       </div>
+      
     </div>
   </template>
 
@@ -85,6 +87,16 @@ let data = ref({
   image: null,
 })
 const selectableContent = reactive({})
+
+const deleteProduct = async () => {
+   const response = await axios.post(`/api/restaurant/deleteProduct/${productId}` , {withCredentials : true});
+   if(response.data.success){
+    router.push("/restaurant/update")
+   }else{
+    alert("ürün silinirken bir hata oluştu!")
+   }
+}
+
 
 onMounted(async () => {
     const response = await axios.get(`/api/restaurant/product/details/${productId}` , {withCredentials : true})

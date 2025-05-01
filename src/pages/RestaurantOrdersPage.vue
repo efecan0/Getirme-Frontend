@@ -52,6 +52,7 @@
                 v-for="status in availableStatuses"
                 :key="status"
                 class="btn btn-sm btn-outline-warning fw-bold"
+                :class="status == order.status ? 'btn-warning text-white' : ''"
                 @click.stop="updateOrderStatus(order.id, status)"
               >
                 {{ statusText(status) }}
