@@ -1,7 +1,7 @@
 <template>
   <div class="container py-4">
     
-    <h1 class="h3 fw-bold text-warning mb-4">🍽️ Restoranlar</h1>
+    <h1 class="h3 fw-bold text-warning mb-4">🍽️ Restaurants</h1>
 
     <!-- Spinner Yükleniyor -->
     <div v-if="loading" class="d-flex justify-content-center align-items-center" style="height: 300px;">

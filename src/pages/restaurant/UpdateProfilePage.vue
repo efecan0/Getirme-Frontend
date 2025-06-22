@@ -1,170 +1,166 @@
-    <template>
-        <div class="container justify-content-around row d-flex mt-5 mx-auto">
-
-                <div class="update-box bg-white p-5 rounded shadow-lg my-auto me-5 col">
-                <div class="text-center mb-4">
-                <h1 class="text-main">Restaurant Bilgilerini Güncelle</h1>
-                <p class="text-muted">Restoran bilgilerinizi güncelleyin</p>
-                </div>
-                <form @submit.prevent="updateRestaurant">
-        
-                <!-- Restaurant Image Preview -->
-                <div class="form-group text-center">
-                    <div class="image-wrapper" @click="triggerFileInput">
-                    <img 
-                        :src=" previewImage || 'data:image/png;base64,' + restaurant.image " 
-                        alt="Restaurant Resmi" 
-                        class="img-fluid rounded shadow-sm restaurant-image"
-                    />
-                    <div class="overlay">Resmi Değiştir</div>
-                    </div>
-                    <input 
-                    type="file" 
-                    ref="fileInput" 
-                    @change="onImageChange" 
-                    accept="image/*" 
-                    hidden 
-                    />
-                    
-                    <div v-if="errors.image" class="invalid-feedback d-block">{{ errors.image }}</div>
-                </div>
-                <div class="mb-4">
-                    <small class="form-text text-muted">Mevcut resmi değiştirmek için resme tıklayın.</small>
-                </div>
-                <!-- Restaurant Name Input -->
-                <div class="form-group mb-3">
-                    <input 
-                    type="text" 
-                    v-model="restaurant.name" 
-                    placeholder="Restaurant Adı" 
-                    class="form-control form-control-lg border-main"
-                    :class="{'is-invalid': errors.name}"
-                    required
-                    />
-                    <div v-if="errors.name" class="invalid-feedback">{{ errors.name }}</div>
-                </div>
-        
-                <!-- Phone Number Input -->
-                <div class="form-group mb-3">
-                    <input 
-                    type="text" 
-                    v-model="restaurant.phoneNumber" 
-                    placeholder="Telefon Numarası (İsteğe Bağlı)" 
-                    class="form-control form-control-lg border-main"
-                    :class="{'is-invalid': errors.phoneNumber}"
-                    />
-                    <div v-if="errors.phoneNumber" class="invalid-feedback">{{ errors.phoneNumber }}</div>
-                    <small class="form-text text-muted">Numaranızı değiştirmek istemiyorsanız boş bırakın.</small>
-                </div>
-        
-                <!-- Location Input -->
-                <div class="form-group mb-3">
-                    <input 
-                    type="text" 
-                    v-model="restaurant.location" 
-                    placeholder="Lokasyon" 
-                    class="form-control form-control-lg border-main"
-                    :class="{'is-invalid': errors.location}"
-                    required
-                    />
-                    <div v-if="errors.location" class="invalid-feedback">{{ errors.location }}</div>
-                </div>
-        
-                <!-- Password Input -->
-                <div class="form-group mb-3">
-                    <input 
-                    type="password" 
-                    v-model="restaurant.password" 
-                    placeholder="Yeni Şifre (İsteğe Bağlı)" 
-                    class="form-control form-control-lg border-main"
-                    :class="{'is-invalid': errors.password}"
-                    />
-                    <div v-if="errors.password" class="invalid-feedback">{{ errors.password }}</div>
-                    <small class="form-text text-muted">Şifreyi değiştirmek istemiyorsanız boş bırakın.</small>
-                </div>
-        
-                <!-- Opening and Closing Times -->
-                <label class="form-label">Açılış ve Kapanış Saatleri</label>
-                <div class="row mb-3">
-                    <div class="col">
-                    <input 
-                        type="time" 
-                        v-model="restaurant.openingTime" 
-                        class="form-control form-control-lg border-main"
-                        required
-                    />
-                    </div>
-                    <div class="col">
-                    <input 
-                        type="time" 
-                        v-model="restaurant.closingTime" 
-                        class="form-control form-control-lg border-main"
-                        required
-                    />
-                    </div>
-                </div>
-        
-                <!-- Max Service Distance Input -->
-                <div class="form-group mb-3">
-                    <input 
-                    type="number" 
-                    v-model="restaurant.maxServiceDistance" 
-                    placeholder="Maksimum Hizmet Mesafesi (km)" 
-                    class="form-control form-control-lg border-main"
-                    required
-                    />
-                </div>
-        
-                <!-- Min Service Price Per Km Input -->
-                <div class="form-group mb-4">
-                    <input 
-                    type="number" 
-                    v-model="restaurant.minServicePricePerKm" 
-                    placeholder="Kilometre Başına Minimum Hizmet Ücreti" 
-                    class="form-control form-control-lg border-main"
-                    required
-                    />
-                </div>
-        
-                <button type="submit" class="btn btn-main btn-lg w-100 mb-3">Bilgileri Güncelle</button>
-                </form>
-                </div>
-
-
-                <div v-if="products.length > 0" class="col row d-flex justify-content-start " style="max-height: 350px;">
-                    <div  v-for="product in products" :key="product.id" class="col-4 mb-3">
-                        <div class="card product-card shadow-sm" @click="goToProduct(product.id)" style="cursor: pointer;">
-                        <img
-                            v-if="product.image"
-                            :src="'data:image/png;base64,' + product.image"
-                            class="card-img-top"
-                            alt="Ürün Resmi"
-                            style="height: 200px; object-fit: cover;"
-                        />
-                        <div v-else class="d-flex justify-content-center align-items-center bg-secondary text-white" style="height: 200px;">
-                            Görsel Yok
-                        </div>
-                        <div class="card-body d-flex flex-column justify-content-between">
-                            <div>
-                            <h5 class="card-title fw-bold">{{ product.name }}</h5>
-                            <p class="card-text small text-muted">{{ product.description }}</p>
-                            </div>
-                            <div class="mt-3 text-end">
-                            <span class="badge bg-warning text-dark">{{ formatPrice(product.price) }}</span>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    
-                </div>
-                
-                
-           
-
-
+<template>
+    <div class="container justify-content-around row d-flex mt-5 mx-auto">
+  
+      <div class="update-box bg-white p-5 rounded shadow-lg my-auto me-5 col">
+        <div class="text-center mb-4">
+          <h1 class="text-main">Update Restaurant Information</h1>
+          <p class="text-muted">Update your restaurant details</p>
         </div>
-    </template>
-    
+        <form @submit.prevent="updateRestaurant">
+  
+          <!-- Restaurant Image Preview -->
+          <div class="form-group text-center">
+            <div class="image-wrapper" @click="triggerFileInput">
+              <img 
+                :src=" previewImage || 'data:image/png;base64,' + restaurant.image " 
+                alt="Restaurant Image" 
+                class="img-fluid rounded shadow-sm restaurant-image"
+              />
+              <div class="overlay">Change Image</div>
+            </div>
+            <input 
+              type="file" 
+              ref="fileInput" 
+              @change="onImageChange" 
+              accept="image/*" 
+              hidden 
+            />
+            <div v-if="errors.image" class="invalid-feedback d-block">{{ errors.image }}</div>
+          </div>
+          <div class="mb-4">
+            <small class="form-text text-muted">Click the image to change the current image.</small>
+          </div>
+  
+          <!-- Restaurant Name Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="text" 
+              v-model="restaurant.name" 
+              placeholder="Restaurant Name" 
+              class="form-control form-control-lg border-main"
+              :class="{'is-invalid': errors.name}"
+              required
+            />
+            <div v-if="errors.name" class="invalid-feedback">{{ errors.name }}</div>
+          </div>
+  
+          <!-- Phone Number Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="text" 
+              v-model="restaurant.phoneNumber" 
+              placeholder="Phone Number (Optional)" 
+              class="form-control form-control-lg border-main"
+              :class="{'is-invalid': errors.phoneNumber}"
+            />
+            <div v-if="errors.phoneNumber" class="invalid-feedback">{{ errors.phoneNumber }}</div>
+            <small class="form-text text-muted">Leave empty if you don't want to change the phone number.</small>
+          </div>
+  
+          <!-- Location Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="text" 
+              v-model="restaurant.location" 
+              placeholder="Location" 
+              class="form-control form-control-lg border-main"
+              :class="{'is-invalid': errors.location}"
+              required
+            />
+            <div v-if="errors.location" class="invalid-feedback">{{ errors.location }}</div>
+          </div>
+  
+          <!-- Password Input -->
+          <div class="form-group mb-3">
+            <input 
+              type="password" 
+              v-model="restaurant.password" 
+              placeholder="New Password (Optional)" 
+              class="form-control form-control-lg border-main"
+              :class="{'is-invalid': errors.password}"
+            />
+            <div v-if="errors.password" class="invalid-feedback">{{ errors.password }}</div>
+            <small class="form-text text-muted">Leave empty if you don't want to change the password.</small>
+          </div>
+  
+          <!-- Opening and Closing Times -->
+          <label class="form-label">Opening and Closing Times</label>
+          <div class="row mb-3">
+            <div class="col">
+              <input 
+                type="time" 
+                v-model="restaurant.openingTime" 
+                class="form-control form-control-lg border-main"
+                required
+              />
+            </div>
+            <div class="col">
+              <input 
+                type="time" 
+                v-model="restaurant.closingTime" 
+                class="form-control form-control-lg border-main"
+                required
+              />
+            </div>
+          </div>
+  
+          <!-- Max Service Distance Input -->
+          <label class="form-label">Maximum Service Distance (km)</label>
+          <div class="form-group mb-3">
+            <input 
+              type="number" 
+              v-model="restaurant.maxServiceDistance" 
+              placeholder="Maximum Service Distance (km)" 
+              class="form-control form-control-lg border-main"
+              required
+            />
+          </div>
+  
+          <!-- Min Service Price Per Km Input -->
+          <label class="form-label">Minimum Service Fee per Kilometer</label>
+          <div class="form-group mb-4">
+            <input 
+              type="number" 
+              v-model="restaurant.minServicePricePerKm" 
+              placeholder="Minimum Service Fee per Kilometer" 
+              class="form-control form-control-lg border-main"
+              required
+            />
+          </div>
+  
+          <button type="submit" class="btn btn-main btn-lg w-100 mb-3">Update Information</button>
+        </form>
+      </div>
+  
+      <div v-if="products.length > 0" class="col row d-flex justify-content-start" style="max-height: 350px;">
+        <div v-for="product in products" :key="product.id" class="col-4 mb-3">
+          <div class="card product-card shadow-sm" @click="goToProduct(product.id)" style="cursor: pointer;">
+            <img
+              v-if="product.image"
+              :src="'data:image/png;base64,' + product.image"
+              class="card-img-top"
+              alt="Product Image"
+              style="height: 200px; object-fit: cover;"
+            />
+            <div v-else class="d-flex justify-content-center align-items-center bg-secondary text-white" style="height: 200px;">
+              No Image
+            </div>
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title fw-bold">{{ product.name }}</h5>
+                <p class="card-text small text-muted">{{ product.description }}</p>
+              </div>
+              <div class="mt-3 text-end">
+                <span class="badge bg-warning text-dark">{{ formatPrice(product.price) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+    </div>
+  </template>
+  
     <script setup>
     import { ref, onMounted } from 'vue'
     import axios from 'axios'

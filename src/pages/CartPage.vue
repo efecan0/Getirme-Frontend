@@ -1,14 +1,14 @@
 <template>
   <div class="container py-4">
+    <ToastNotification v-if="showToast" :message="toastMessage" :duration="3000" />
+    <h1 class="h3 fw-bold text-warning mb-4">🛒 My Cart</h1>
 
-    <h1 class="h3 fw-bold text-warning mb-4">🛒 Sepetim</h1>
-
-    <!-- Sepet boşsa -->
+    <!-- If cart is empty -->
     <div v-if="cartStore.products.length === 0" class="alert alert-info text-center">
-      Sepetiniz şu anda boş.
+      Your cart is currently empty.
     </div>
 
-    <!-- Sepette ürünler varsa -->
+    <!-- If cart has products -->
     <div v-else>
 
       <div class="row g-4">
@@ -19,21 +19,21 @@
         >
           <div class="card shadow-sm product-card d-flex flex-row align-items-center">
 
-            <!-- Ürün Resmi -->
+            <!-- Product Image -->
             <div class="p-2">
               <img 
                 v-if="product.image"
                 :src="'data:image/jpeg;base64,' + product.image" 
-                alt="Ürün" 
+                alt="Product Image" 
                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
               />
             </div>
 
-            <!-- Ürün Bilgileri -->
+            <!-- Product Info -->
             <div class="flex-grow-1 p-2">
-              <h5 class="fw-bold mb-1">Ürün ID: {{ product.productId }}</h5> 
-              <small class="text-muted">Boyut: {{ product.size }}</small>
-              <!-- Seçilen İçerikler -->
+              <h5 class="fw-bold mb-1">Product ID: {{ product.productId }}</h5> 
+              <small class="text-muted">Quantity: {{ product.size }}</small>
+              <!-- Selected Options -->
               <div class="mt-2 small">
                 <div v-for="(content, idx) in product.selectableContentNames" :key="idx">
                   <i class="bi bi-check2-circle text-success"></i>
@@ -42,8 +42,8 @@
                 </div>
               </div>
             </div>
-            <span class="me-2"><strong>{{ product.price }} TL</strong></span>
-            <!-- Sil Butonu -->
+            <span class="me-2"><strong>{{ product.price }} ₺</strong></span>
+            <!-- Delete Button -->
             <div class="p-2">
               <button @click="removeProduct(index)" class="btn btn-sm btn-outline-danger">
                 <i class="bi bi-trash"></i>
@@ -54,13 +54,13 @@
         </div>
       </div>
 
-      <!-- Sepet Alt Bilgi -->
+      <!-- Cart Footer -->
       <div class="mt-5 d-flex justify-content-between align-items-center">
         <button class="btn btn-outline-danger fw-bold" @click="clearCart">
-          <i class="bi bi-trash-fill"></i> Sepeti Temizle
+          <i class="bi bi-trash-fill"></i> Clear Cart
         </button>
         <button class="btn btn-warning fw-bold" @click="createOrder">
-          <i class="bi bi-bag-check-fill"></i> Siparişi Tamamla ({{ totalPrice }} TL)
+          <i class="bi bi-bag-check-fill"></i> Place Order ({{ totalPrice }} ₺)
         </button>
       </div>
 
@@ -72,8 +72,13 @@
 <script setup>
 import { useCartStore } from '@/store/cart';
 import axios from 'axios';
-import { computed } from 'vue';
+import { computed,ref } from 'vue';
 import { useRouter } from 'vue-router';
+import ToastNotification from '../components/ToastNotification.vue'; 
+
+
+const showToast = ref(false);
+const toastMessage = ref('');
 
 const cartStore = useCartStore();
 const router = useRouter();
@@ -86,16 +91,13 @@ const clearCart = () => {
   cartStore.clearCart();
 };
 
-console.log(cartStore.products)
-
 let totalPrice = computed(() => {
   let sum = 0;
-  for(let index in cartStore.products){
+  for (let index in cartStore.products) {
     sum += cartStore.products[index].price;
   }
   return sum;
-})
-
+});
 
 const createOrder = async () => {
   try {
@@ -109,10 +111,13 @@ const createOrder = async () => {
     };
 
     await axios.post('/api/createOrder', payload, { withCredentials: true });
+    
     cartStore.clearCart();
     router.push('/my-orders');
   } catch (error) {
-    alert(error.response.data.exception.message.split(":")[1]);
+    console.log(error)
+    toastMessage.value = error?.response?.data?.exception?.message?.split(":")[1] || "An Error Occured.";
+    showToast.value = true;
   }
 };
 </script>

@@ -1,139 +1,139 @@
 <template>
-    <div class="container-fluid d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div class="register-box bg-white p-5 rounded shadow-lg">
-        <div class="text-center mb-4">
-          <h1 class="text-main">Restaurant Kayıt</h1>
-          <p class="text-muted">Restoranınızı Kaydedin</p>
+  <div class="container-fluid d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="register-box bg-white p-5 rounded shadow-lg">
+      <div class="text-center mb-4">
+        <h1 class="text-main">Restaurant Registration</h1>
+        <p class="text-muted">Register Your Restaurant</p>
+      </div>
+      <form @submit.prevent="register">
+        <!-- Restaurant Name Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="text" 
+            v-model="restaurant.name" 
+            placeholder="Restaurant Name" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.name}"
+          />
+          <div v-if="errors.name" class="invalid-feedback">{{ errors.name }}</div>
         </div>
-        <form @submit.prevent="register">
-          <!-- Restaurant Name Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="text" 
-              v-model="restaurant.name" 
-              placeholder="Restaurant Adı" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.name}"
-            />
-            <div v-if="errors.name" class="invalid-feedback">{{ errors.name }}</div>
-          </div>
-  
-          <!-- Phone Number Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="text" 
-              v-model="restaurant.phoneNumber" 
-              placeholder="Telefon Numarası" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.phoneNumber}"
-            />
-            <div v-if="errors.phoneNumber" class="invalid-feedback">{{ errors.phoneNumber }}</div>
-          </div>
-  
-          <!-- Location Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="text" 
-              v-model="restaurant.location" 
-              placeholder="Lokasyon" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.location}"
-            />
-            <div v-if="errors.location" class="invalid-feedback">{{ errors.location }}</div>
-          </div>
-  
-          <!-- Password Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="password" 
-              v-model="restaurant.password" 
-              placeholder="Şifre" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.password}"
-            />
-            <div v-if="errors.password" class="invalid-feedback">{{ errors.password }}</div>
-          </div>
-  
-          <!-- Opening Time Input -->
-          <label for="">Açılış ve Kapanış Saatleri</label>
-          <div class="form-group mb-3">
-            <input 
-              type="time" 
-              v-model="restaurant.openingTime" 
-              placeholder="Açılış Saati" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.openingTime}"
-            />
-            <div v-if="errors.openingTime" class="invalid-feedback">{{ errors.openingTime }}</div>
-          </div>
-  
-          <!-- Closing Time Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="time" 
-              v-model="restaurant.closingTime" 
-              placeholder="Kapanış Saati" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.closingTime}"
-            />
-            <div v-if="errors.closingTime" class="invalid-feedback">{{ errors.closingTime }}</div>
-          </div>
-  
-          <label for="">Profil Resmi</label>
-          <!-- Image Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="file" 
-              @change="onImageChange" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.image}"
-            />
-            <div v-if="errors.image" class="invalid-feedback">{{ errors.image }}</div>
-          </div>
-  
-          <!-- Max Service Distance Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="number" 
-              v-model="restaurant.maxServiceDistance" 
-              placeholder="Maksimum Hizmet Mesafesi (km)" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.maxServiceDistance}"
-            />
-            <div v-if="errors.maxServiceDistance" class="invalid-feedback">{{ errors.maxServiceDistance }}</div>
-          </div>
-  
-          <!-- Min Service Price Per Km Input -->
-          <div class="form-group mb-4">
-            <input 
-              type="number" 
-              v-model="restaurant.minServicePricePerKm" 
-              placeholder="Kilometre Başına Minimum Hizmet Ücreti" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.minServicePricePerKm}"
-            />
-            <div v-if="errors.minServicePricePerKm" class="invalid-feedback">{{ errors.minServicePricePerKm }}</div>
-          </div>
-  
-          <button type="submit" class="btn btn-main btn-lg w-100 mb-3">Kayıt Ol</button>
-        </form>
-        <div class="d-flex justify-content-between">
-          <a href="/login" class="text-dark">Zaten Hesabınız Var mı? Giriş Yap</a>
+
+        <!-- Phone Number Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="text" 
+            v-model="restaurant.phoneNumber" 
+            placeholder="Phone Number" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.phoneNumber}"
+          />
+          <div v-if="errors.phoneNumber" class="invalid-feedback">{{ errors.phoneNumber }}</div>
         </div>
+
+        <!-- Location Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="text" 
+            v-model="restaurant.location" 
+            placeholder="Location" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.location}"
+          />
+          <div v-if="errors.location" class="invalid-feedback">{{ errors.location }}</div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="password" 
+            v-model="restaurant.password" 
+            placeholder="Password" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.password}"
+          />
+          <div v-if="errors.password" class="invalid-feedback">{{ errors.password }}</div>
+        </div>
+
+        <!-- Opening Time Input -->
+        <label>Opening and Closing Hours</label>
+        <div class="form-group mb-3">
+          <input 
+            type="time" 
+            v-model="restaurant.openingTime" 
+            placeholder="Opening Time" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.openingTime}"
+          />
+          <div v-if="errors.openingTime" class="invalid-feedback">{{ errors.openingTime }}</div>
+        </div>
+
+        <!-- Closing Time Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="time" 
+            v-model="restaurant.closingTime" 
+            placeholder="Closing Time" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.closingTime}"
+          />
+          <div v-if="errors.closingTime" class="invalid-feedback">{{ errors.closingTime }}</div>
+        </div>
+
+        <label>Profile Image</label>
+        <!-- Image Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="file" 
+            @change="onImageChange" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.image}"
+          />
+          <div v-if="errors.image" class="invalid-feedback">{{ errors.image }}</div>
+        </div>
+
+        <!-- Max Service Distance Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="number" 
+            v-model="restaurant.maxServiceDistance" 
+            placeholder="Maximum Service Distance (km)" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.maxServiceDistance}"
+          />
+          <div v-if="errors.maxServiceDistance" class="invalid-feedback">{{ errors.maxServiceDistance }}</div>
+        </div>
+
+        <!-- Min Service Price Per Km Input -->
+        <div class="form-group mb-4">
+          <input 
+            type="number" 
+            v-model="restaurant.minServicePricePerKm" 
+            placeholder="Minimum Service Price Per Kilometer" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.minServicePricePerKm}"
+          />
+          <div v-if="errors.minServicePricePerKm" class="invalid-feedback">{{ errors.minServicePricePerKm }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-main btn-lg w-100 mb-3">Register</button>
+      </form>
+      <div class="d-flex justify-content-between">
+        <a href="/login" class="text-dark">Already have an account? Log In</a>
       </div>
     </div>
-  </template>
-  
-  <script setup>
+  </div>
+</template>
+
+<script setup>
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -187,39 +187,39 @@ function validateForm() {
   }
 
   if (!restaurant.value.name) {
-    errors.value.name = 'Restoran adı boş bırakılamaz.'
+    errors.value.name = 'Restaurant name cannot be empty.'
     isValid = false
   }
   if (!restaurant.value.phoneNumber) {
-    errors.value.phoneNumber = 'Telefon numarası boş bırakılamaz.'
+    errors.value.phoneNumber = 'Phone number cannot be empty.'
     isValid = false
   }
   if (!restaurant.value.location) {
-    errors.value.location = 'Lokasyon boş bırakılamaz.'
+    errors.value.location = 'Location cannot be empty.'
     isValid = false
   }
   if (!restaurant.value.password) {
-    errors.value.password = 'Şifre boş bırakılamaz.'
+    errors.value.password = 'Password cannot be empty.'
     isValid = false
   }
   if (!restaurant.value.openingTime) {
-    errors.value.openingTime = 'Açılış saati boş bırakılamaz.'
+    errors.value.openingTime = 'Opening time cannot be empty.'
     isValid = false
   }
   if (!restaurant.value.closingTime) {
-    errors.value.closingTime = 'Kapanış saati boş bırakılamaz.'
+    errors.value.closingTime = 'Closing time cannot be empty.'
     isValid = false
   }
   if (!restaurant.value.image) {
-    errors.value.image = 'Resim seçilmelidir.'
+    errors.value.image = 'An image must be selected.'
     isValid = false
   }
   if (!restaurant.value.maxServiceDistance || restaurant.value.maxServiceDistance < 1) {
-    errors.value.maxServiceDistance = 'Maksimum hizmet mesafesi en az 1 km olmalıdır.'
+    errors.value.maxServiceDistance = 'Maximum service distance must be at least 1 km.'
     isValid = false
   }
   if (!restaurant.value.minServicePricePerKm || restaurant.value.minServicePricePerKm < 0) {
-    errors.value.minServicePricePerKm = 'Minimum hizmet ücreti sıfırdan küçük olamaz.'
+    errors.value.minServicePricePerKm = 'Minimum service price cannot be less than zero.'
     isValid = false
   }
 
@@ -239,7 +239,7 @@ function register() {
 
   axios.post('/api/restaurant/register', formData)
     .then((response) => {
-      console.log("response: ", response)
+      console.log("Response: ", response)
       if (response.data.success) {
         router.push("/login");
       }
@@ -248,7 +248,7 @@ function register() {
       console.error("Network Error:", error)
     })
 
-  console.log('Restoran kaydedildi:', restaurant.value)
+  console.log('Restaurant registered:', restaurant.value)
 }
 </script>
 

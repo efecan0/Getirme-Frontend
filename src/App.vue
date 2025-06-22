@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import Navbar from '@/components/NavBar.vue'; // doğru yolu kontrol et
+import Navbar from '@/components/NavBar.vue';
 </script>
 
 <style>

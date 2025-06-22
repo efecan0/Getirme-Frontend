@@ -1,95 +1,92 @@
 <template>
-    <div class="container-fluid d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div class="register-box bg-white p-5 rounded shadow-lg">
-        <div class="text-center mb-4">
-          <h1 class="text-main">Kayıt Ol</h1>
-          <p class="text-muted">Hesabınızı Oluşturun</p>
-        </div>
-        <form @submit.prevent="register">
-          <!-- Name Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="text" 
-              v-model="customer.name" 
-              placeholder="Ad" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.name}"
-            />
-            <div v-if="errors.name" class="invalid-feedback">{{ errors.name }}</div>
-          </div>
-          
-          <!-- Surname Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="text" 
-              v-model="customer.surname" 
-              placeholder="Soyad" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.surname}"
-            />
-            <div v-if="errors.surname" class="invalid-feedback">{{ errors.surname }}</div>
-          </div>
-          
-          <!-- Phone Number Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="text" 
-              v-model="customer.phoneNumber" 
-              placeholder="Telefon Numarası" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.phoneNumber}"
-            />
-            <div v-if="errors.phoneNumber" class="invalid-feedback">{{ errors.phoneNumber }}</div>
-          </div>
-  
-          <!-- Location Input -->
-          <div class="form-group mb-3">
-            <input 
-              type="text" 
-              v-model="customer.location" 
-              placeholder="Lokasyon" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.location}"
-            />
-            <div v-if="errors.location" class="invalid-feedback">{{ errors.location }}</div>
-          </div>
-  
-          <!-- Password Input -->
-          <div class="form-group mb-4">
-            <input 
-              type="password" 
-              v-model="customer.password" 
-              placeholder="Şifre" 
-              class="form-control form-control-lg border-main"
-              required 
-              :class="{'is-invalid': errors.password}"
-            />
-            <div v-if="errors.password" class="invalid-feedback">{{ errors.password }}</div>
-          </div>
-  
-          <button type="submit" class="btn btn-main btn-lg w-100 mb-3">Kayıt Ol</button>
-        </form>
-        <div class="d-flex justify-content-between">
-          <a href="/login" class="text-dark">Zaten Hesabınız Var mı? Giriş Yap</a>
-          
-        </div>
-        <div class="d-flex justify-content-between mt-3">
-          <a href="/restaurant/register" class="text-dark">Restaurant mısınız? Kayıt Ol</a>
-          
+  <div class="container-fluid d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="register-box bg-white p-5 rounded shadow-lg">
+      <div class="text-center mb-4">
+        <h1 class="text-main">Sign Up</h1>
+        <p class="text-muted">Create Your Account</p>
+      </div>
+      <form @submit.prevent="register">
+        <!-- Name Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="text" 
+            v-model="customer.name" 
+            placeholder="First Name" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.name}"
+          />
+          <div v-if="errors.name" class="invalid-feedback">{{ errors.name }}</div>
         </div>
         
+        <!-- Surname Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="text" 
+            v-model="customer.surname" 
+            placeholder="Last Name" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.surname}"
+          />
+          <div v-if="errors.surname" class="invalid-feedback">{{ errors.surname }}</div>
+        </div>
+        
+        <!-- Phone Number Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="text" 
+            v-model="customer.phoneNumber" 
+            placeholder="Phone Number" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.phoneNumber}"
+          />
+          <div v-if="errors.phoneNumber" class="invalid-feedback">{{ errors.phoneNumber }}</div>
+        </div>
+
+        <!-- Location Input -->
+        <div class="form-group mb-3">
+          <input 
+            type="text" 
+            v-model="customer.location" 
+            placeholder="Location" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.location}"
+          />
+          <div v-if="errors.location" class="invalid-feedback">{{ errors.location }}</div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group mb-4">
+          <input 
+            type="password" 
+            v-model="customer.password" 
+            placeholder="Password" 
+            class="form-control form-control-lg border-main"
+            required 
+            :class="{'is-invalid': errors.password}"
+          />
+          <div v-if="errors.password" class="invalid-feedback">{{ errors.password }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-main btn-lg w-100 mb-3">Sign Up</button>
+      </form>
+      <div class="d-flex justify-content-between">
+        <a href="/login" class="text-dark">Already have an account? Log In</a>
+      </div>
+      <div class="d-flex justify-content-between mt-3">
+        <a href="/restaurant/register" class="text-dark">Are you a restaurant? Register</a>
       </div>
     </div>
-  </template>
-  
-  <script setup>
+  </div>
+</template>
+
+<script setup>
 import { reactive } from 'vue'
 import axios from 'axios'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
 let router = useRouter();
 
@@ -118,28 +115,28 @@ const validateForm = () => {
   errors.password = ''
 
   if (!customer.name || customer.name.length < 2 || customer.name.length > 50) {
-    errors.name = 'Ad 2-50 karakter arasında olmalıdır.'
+    errors.name = 'First name must be between 2 and 50 characters.'
     isValid = false
   }
   if (!customer.surname || customer.surname.length < 2 || customer.surname.length > 50) {
-    errors.surname = 'Soyad 2-50 karakter arasında olmalıdır.'
+    errors.surname = 'Last name must be between 2 and 50 characters.'
     isValid = false
   }
 
   const phonePattern = /^5[0-9]{9}$/
   if (!phonePattern.test(customer.phoneNumber)) {
-    errors.phoneNumber = 'Telefon numarası 10 haneli ve 5 ile başlamalıdır.'
+    errors.phoneNumber = 'Phone number must be 10 digits and start with 5.'
     isValid = false
   }
 
   if (!customer.location) {
-    errors.location = 'Lokasyon boş bırakılamaz.'
+    errors.location = 'Location cannot be empty.'
     isValid = false
   }
 
   const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/
   if (!passwordPattern.test(customer.password)) {
-    errors.password = 'Şifre en az 8 karakter olmalı, 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir.'
+    errors.password = 'Password must be at least 8 characters, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.'
     isValid = false
   }
 
@@ -147,19 +144,18 @@ const validateForm = () => {
 }
 
 const register = async () => {
-  Object.keys(errors).forEach(key => errors[key] = '') // Hataları sıfırla
+  Object.keys(errors).forEach(key => errors[key] = '') // Reset errors
   if (!validateForm()) return
 
   try {
     const res = await axios.post("/api/customer/register", customer)
     console.log(res)
-    if(res.data.success){
+    if (res.data.success) {
       router.push("/login");
     }
   } catch (err) {
-    console.error("Kayıt sırasında bir hata oluştu:", err)
+    console.error("An error occurred during registration:", err)
   }
-
 }
 </script>
 

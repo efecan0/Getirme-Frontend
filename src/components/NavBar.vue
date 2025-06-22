@@ -4,68 +4,68 @@
 
       <!-- Logo -->
       <a class="navbar-brand fw-bold text-white" href="#" @click.prevent="goHomeSmart">
-        Getirme<span style="color: #FF9F00;">.</span>
+        EcoEats<span style="color: #FF9F00;">.</span>
       </a>
 
-      <!-- Hamburger Menü -->
+      <!-- Hamburger Menu -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- Menü İçeriği -->
+      <!-- Menu Content -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
 
-          <!-- Sepet -->
+          <!-- Cart -->
           <li class="nav-item" v-if="userType=='CUSTOMER'">
             <router-link class="nav-link text-white fw-bold" to="/cart">
-              <i class="bi bi-cart"></i> Sepetim<span v-if="cartCount > 0"> ({{ cartCount }})</span>
+              <i class="bi bi-cart"></i> My Cart<span v-if="cartCount > 0"> ({{ cartCount }})</span>
             </router-link>
           </li>
 
-
+          <!-- Restaurant Profile -->
           <li class="nav-item" v-if="userType=='RESTAURANT'">
             <router-link class="nav-link text-white fw-bold" to="/restaurant/update">
-              <i class="bi bi-person-circle"></i> Profil
+              <i class="bi bi-person-circle"></i> Profile
             </router-link>
           </li>
 
+          <!-- Customer Profile -->
           <li class="nav-item" v-if="userType=='CUSTOMER'">
             <router-link class="nav-link text-white fw-bold" to="/customer/update">
-              <i class="bi bi-person-circle"></i> Profil
+              <i class="bi bi-person-circle"></i> Profile
             </router-link>
           </li>
 
+          <!-- Create Product -->
           <li class="nav-item" v-if="userType=='RESTAURANT'">
             <router-link class="nav-link text-white fw-bold" to="/restaurant/create-product">
-              <i class="bi bi-plus-circle"></i> Ürün Oluştur
+              <i class="bi bi-plus-circle"></i> Add Product
             </router-link>
           </li>
 
-          
-
-          <!-- Siparişlerim -->
+          <!-- Orders -->
           <li class="nav-item" v-if="userType=='CUSTOMER'">
             <router-link class="nav-link text-white fw-bold" to="/my-orders">
-              <i class="bi bi-list-check"></i> Siparişlerim
+              <i class="bi bi-list-check"></i> My Orders
             </router-link>
           </li>
           <li class="nav-item" v-else-if="userType=='RESTAURANT'">
             <router-link class="nav-link text-white fw-bold" to="/restaurant-orders">
-              <i class="bi bi-list-check"></i> Siparişlerim
+              <i class="bi bi-list-check"></i> Orders
             </router-link>
           </li>
 
           <!-- Login / Logout -->
           <li class="nav-item" v-if="!isLoggedIn">
             <router-link class="nav-link text-white fw-bold" to="/login">
-              <i class="bi bi-box-arrow-in-right"></i> Giriş Yap
+              <i class="bi bi-box-arrow-in-right"></i> Login
             </router-link>
           </li>
 
           <li class="nav-item" v-else>
             <button class="nav-link text-white fw-bold btn btn-link" @click="logout" style="text-decoration: none;">
-              <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+              <i class="bi bi-box-arrow-right"></i> Logout
             </button>
           </li>
 
@@ -85,21 +85,17 @@ import { storeToRefs } from 'pinia';
 const cartStore = useCartStore();
 const authStore = useAuthStore();
 
-// Pinia'dan reactive değerleri alıyoruz
 const { isLoggedIn, userType } = storeToRefs(authStore);
 const cartCount = computed(() => cartStore.products.length);
 
-// Auth kontrolünü başlatıyoruz
 onMounted(async () => {
   await authStore.checkAuth();
 });
 
-// Logo tıklayınca yönlendirme
 const goHomeSmart = () => {
   authStore.goHomeSmart();
 };
 
-// Çıkış işlemi için store action'ını kullanıyoruz
 const logout = () => {
   authStore.logout();
 };

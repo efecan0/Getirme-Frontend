@@ -1,17 +1,19 @@
 <template>
     <div class="container-fluid d-flex justify-content-center align-items-center vh-100 bg-light">
+      <ToastNotification v-if="showToast" :message="toastMessage" :duration="3000" />
+
       <div class="login-box bg-white p-5 rounded shadow-lg">
         <div class="text-center mb-4">
           <!-- Logo Buraya Gelebilir -->
-          <h1 class="text-main">Getirme</h1>
-          <p class="text-muted">Hesabınıza Giriş Yapın</p>
+          <h1 class="text-main">EcoEats</h1>
+          <p class="text-muted">Log In</p>
         </div>
         <form @submit.prevent="login">
           <div class="form-group mb-4">
             <input 
               type="text" 
               v-model="phoneNumber" 
-              placeholder="Telefon Numarası" 
+              placeholder="Phone Number" 
               class="form-control form-control-lg border-main"
               required 
             />
@@ -20,15 +22,15 @@
             <input 
               type="password" 
               v-model="password" 
-              placeholder="Şifre" 
+              placeholder="Password" 
               class="form-control form-control-lg border-main"
               required 
             />
           </div>
-          <button type="submit" class="btn btn-main btn-lg w-100 mb-4">Giriş Yap</button>
+          <button type="submit" class="btn btn-main btn-lg w-100 mb-4">Log In</button>
           <div class="d-flex justify-content-between">
-            <a href="#" class="text-dark">Şifremi Unuttum</a>
-            <a href="/register" class="text-dark">Hesabınız Yok Mu? Kayıt Ol</a>
+            <a href="#" class="text-dark">Forgot Password</a>
+            <a href="/register" class="text-dark">Don't have an account? Sign up</a>
           </div>
         </form>
       </div>
@@ -40,20 +42,33 @@ import axios from 'axios'
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
+import ToastNotification from '../components/ToastNotification.vue'; 
+
+const showToast = ref(false);
+const toastMessage = ref('');
+
+
 const authStore = useAuthStore();
 
   let phoneNumber = ref("");
   let password = ref("");
   let router = useRouter();
 
-  function login(){
-    axios.post("/api/login", {phoneNumber : phoneNumber.value , password : password.value }).then(async (res) => {
-          if(res.data.success){
-            await authStore.checkAuth();
-            router.push("/restaurant-list")
-          }
-        })
+  async function login() {
+  try {
+    const res = await axios.post("/api/login", { phoneNumber: phoneNumber.value, password: password.value });
+    if (res.data.success) {
+      await authStore.checkAuth();
+      router.push("/restaurant-list");
+    } else {
+      toastMessage.value = res.data.message || "Your username or password is incorrect.";
+      showToast.value = true;
+    }
+  } catch (err) {
+    toastMessage.value = err.response?.data?.message || "Your username or password is incorrect.";
+    showToast.value = true;
   }
+}
   </script>
   
   <style scoped>

@@ -1,28 +1,28 @@
 <template>
   <div class="container py-4" v-if="product && restaurantId">
 
-    <!-- Geri Dön Butonu -->
+    <!-- Back to Restaurant Button -->
     <div class="mb-4">
       <button class="btn btn-outline-warning fw-bold" @click="goBackToRestaurant">
-        <i class="bi bi-arrow-left"></i> Restorana Geri Dön
+        <i class="bi bi-arrow-left"></i> Back to Restaurant
       </button>
     </div>
 
-    <!-- Ürün Detayı -->
+    <!-- Product Details -->
     <div class="card custom-card shadow-sm mb-4">
       <img
         v-if="product.image"
         :src="'data:image/jpeg;base64,' + product.image"
         class="card-img-top"
-        alt="Ürün Resmi"
+        alt="Product Image"
         style="height: 250px; object-fit: cover;"
       />
       <div class="card-body">
         <h2 class="h4 fw-bold text-warning">{{ product.name }}</h2>
         <p class="text-muted">{{ product.description }}</p>
 
-        <!-- Adet Seçimi -->
-        <h5 class="mt-4">Adet</h5>
+        <!-- Quantity Selection -->
+        <h5 class="mt-4">Quantity</h5>
         <div class="d-flex align-items-center gap-3 mb-4 justify-content-center">
           <button class="btn btn-outline-warning" @click="decreaseQuantity">
             <i class="bi bi-dash"></i>
@@ -33,13 +33,12 @@
           </button>
         </div>
 
-        <!-- İçerik Seçimi -->
-        <h5 class="mt-4">İçerik Seçimi</h5>
+        <!-- Content Selection -->
+        <h5 class="mt-4">Select Options</h5>
         <div v-for="content in selectableContent" :key="content.id" class="mb-3">
           <p class="fw-bold mb-2">{{ content.name }}</p>
 
-            <div class="d-flex flex-wrap gap-2 justify-content-center">
-
+          <div class="d-flex flex-wrap gap-2 justify-content-center">
             <button
               v-for="option in content.selectableContentOptionDtoList"
               :key="option.id"
@@ -54,7 +53,7 @@
 
         <div class="mt-4 text-end">
           <button class="btn btn-warning fw-bold" @click="addToCart">
-            <i class="bi bi-cart-plus"></i> Sepete Ekle
+            <i class="bi bi-cart-plus"></i> Add to Cart
           </button>
         </div>
 
@@ -80,7 +79,7 @@ console.log(restaurantId)
 
 const product = ref(null);
 const selectableContent = ref([]);
-const quantity = ref(1); // Adet bilgisi
+const quantity = ref(1);
 const selectedOptions = ref({});
 onMounted(async () => {
   try {
@@ -91,11 +90,11 @@ onMounted(async () => {
       console.log(product.value)
     }
   } catch (error) {
-    console.error('Ürün detayı hatası:', error);
+    console.error('Error fetching product details:', error);
   }
 });
 
-// İçerik Seçimi Toggle
+// Toggle Content Selection
 const toggleOption = (contentId, option) => {
   if (!selectedOptions.value[contentId]) {
     selectedOptions.value[contentId] = [];
@@ -111,12 +110,12 @@ const toggleOption = (contentId, option) => {
   }
 };
 
-// Seçili mi kontrol
+// Check if Option is Selected
 const isSelected = (contentId, optionId) => {
   return selectedOptions.value[contentId]?.some(o => o.id === optionId);
 };
 
-// Adet Arttır / Azalt
+// Increase / Decrease Quantity
 const increaseQuantity = () => {
   quantity.value++;
 };
@@ -124,7 +123,7 @@ const decreaseQuantity = () => {
   if (quantity.value > 1) quantity.value--;
 };
 
-// Sepete Ekle
+// Add to Cart
 const addToCart = () => {
   const selectableContentMap = {};
   const selectableContentNames = [];
@@ -132,14 +131,14 @@ const addToCart = () => {
   for (const [groupId, options] of Object.entries(selectedOptions.value)) {
     selectableContentMap[groupId] = options.map(o => o.id);
     selectableContentNames.push({
-      groupName: selectableContent.value.find(c => c.id == groupId)?.name || "İçerik",
+      groupName: selectableContent.value.find(c => c.id == groupId)?.name || "Option",
       optionNames: options.map(o => o.name),
     });
   }
 
   let totalPrice = 0;
-  for(let index in selectedOptions.value){
-    totalPrice += selectedOptions.value[index][0].price * quantity.value
+  for (let index in selectedOptions.value) {
+    totalPrice += selectedOptions.value[index][0].price * quantity.value;
   }
   
   totalPrice += quantity.value * product.value.price;
@@ -148,16 +147,16 @@ const addToCart = () => {
     image: product.value.image,
     restaurantId: Number(restaurantId),
     productId: Number(productId),
-    size: quantity.value, // Adet
+    size: quantity.value,
     selectableContentMap,
     selectableContentNames,
-    price : totalPrice
+    price: totalPrice
   });
 
   router.push('/cart');
 };
 
-// Restorana Geri Dön
+// Go Back to Restaurant
 const goBackToRestaurant = () => {
   router.push({ name: 'restaurant-details', params: { restaurantId } });
 };

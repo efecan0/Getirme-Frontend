@@ -1,7 +1,7 @@
 <template>
   <div class="container py-4" v-if="restaurant">
 
-    <!-- Restoran Başlığı -->
+    <!-- Restaurant Header -->
     <div class="card custom-card shadow-sm mb-4">
       <div class="row g-0 align-items-center">
         
@@ -11,10 +11,10 @@
             :src="'data:image/jpeg;base64,' + restaurant.image"
             class="img-fluid rounded-circle border border-3 border-warning"
             style="width: 150px; height: 150px; object-fit: cover;"
-            alt="Restoran Resmi"
+            alt="Restaurant Image"
           />
           <div v-else class="d-flex justify-content-center align-items-center bg-secondary text-white rounded-circle" style="width: 150px; height: 150px;">
-            Görsel Yok
+            No Image
           </div>
         </div>
 
@@ -30,19 +30,19 @@
 
             <div class="d-flex gap-3 flex-wrap mt-3">
               <span class="badge bg-light text-dark border border-warning p-2">
-                🚗 Mesafe: {{ formatDistance(restaurant.distance) }}
+                🚗 Distance: {{ formatDistance(restaurant.distance) }}
               </span>
               <span class="badge bg-light text-dark border border-success p-2">
-                💰 Min. Tutar: {{ formatPrice(restaurant.minServicePrice) }}
+                💰 Min. Order: {{ formatPrice(restaurant.minServicePrice) }}
               </span>
               <span class="badge bg-light text-dark border border-primary p-2">
-                🕒 Tahmini Teslim: {{ estimateArrivalTime(restaurant.distance) }} dk
+                🕒 Estimated Delivery: {{ estimateArrivalTime(restaurant.distance)+20 }} min
               </span>
             </div>
 
-            <!-- Karbon Ayak İzi -->
+            <!-- Carbon Footprint -->
             <div class="alert alert-success text-center fw-bold mt-4">
-              🌍 Tahmini Karbon Ayak İzi: {{ estimateCarbonFootprint(restaurant.distance) }} kg CO₂
+              🌍 Estimated Carbon Footprint: {{ estimateCarbonFootprint(restaurant.distance) }} kg CO₂
             </div>
 
           </div>
@@ -51,12 +51,12 @@
       </div>
     </div>
 
-    <!-- Menü Başlığı -->
+    <!-- Menu Header -->
     <h2 class="h4 fw-bold text-warning border-bottom pb-2 mb-4">
-      <i class="bi bi-menu-button-wide me-2"></i>Menü
+      <i class="bi bi-menu-button-wide me-2"></i>Menu
     </h2>
 
-    <!-- Ürünler -->
+    <!-- Products -->
     <div class="row g-4">
       <div v-for="product in products" :key="product.id" class="col-12 col-md-6 col-lg-4">
         <div class="card product-card shadow-sm h-100" @click="goToProduct(product.id)" style="cursor: pointer;">
@@ -64,11 +64,11 @@
             v-if="product.image"
             :src="'data:image/png;base64,' + product.image"
             class="card-img-top"
-            alt="Ürün Resmi"
+            alt="Product Image"
             style="height: 200px; object-fit: cover;"
           />
           <div v-else class="d-flex justify-content-center align-items-center bg-secondary text-white" style="height: 200px;">
-            Görsel Yok
+            No Image
           </div>
           <div class="card-body d-flex flex-column justify-content-between">
             <div>
@@ -92,8 +92,6 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { useCartStore } from '@/store/cart';
 const cartStore = useCartStore();
-
-
 
 const route = useRoute();
 const router = useRouter();
@@ -128,9 +126,9 @@ const estimateArrivalTime = (distanceKm) => {
 
 const estimateCarbonFootprint = (distanceKm) => {
   if (!distanceKm) return '0.00';
-  const carbonPerKm = 50; // 50 gram CO₂
+  const carbonPerKm = 50; // 50 grams CO₂ per km
   const totalCarbonGrams = distanceKm * carbonPerKm;
-  return (totalCarbonGrams / 1000).toFixed(2); // kg cinsinden
+  return (totalCarbonGrams / 1000).toFixed(2); // in kg
 };
 
 onMounted(async () => {
@@ -141,10 +139,10 @@ onMounted(async () => {
       products.value = response.data.data.products;
     }
     if (!cartStore.restaurantId) {
-        cartStore.restaurantId = Number(restaurantId);
-      }
+      cartStore.restaurantId = Number(restaurantId);
+    }
   } catch (error) {
-    console.error('Detay çekme hatası:', error);
+    console.error('Error fetching details:', error);
   } finally {
     loading.value = false;
   }

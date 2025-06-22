@@ -6,7 +6,7 @@ let connected = false;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
-const socketUrl = 'http://localhost:8080/ws';
+const socketUrl = 'http://localhost:8081/ws';
 
 export function connectWebSocket(onOrderStatusUpdate) {
     const socket = new SockJS(socketUrl, null, {

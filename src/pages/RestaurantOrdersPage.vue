@@ -1,41 +1,41 @@
 <template>
   <div class="container py-4">
 
-    <!-- Yeni Sipariş Toast Bildirimi -->
-    <ToastNotification v-if="showNewOrderToast" message="🚀 Yeni Sipariş Geldi!" />
+    <!-- New Order Toast Notification -->
+    <ToastNotification v-if="showNewOrderToast" message="🚀 New Order Received!" />
 
-    <h1 class="h3 fw-bold text-warning mb-4">📦 Gelen Siparişler</h1>
+    <h1 class="h3 fw-bold text-warning mb-4">📦 Incoming Orders</h1>
 
     <div v-if="activeOrders.length === 0" class="alert alert-info text-center">
-      Şu anda aktif bir sipariş yok.
+      There are currently no active orders.
     </div>
 
     <div v-else class="row g-4">
       <div v-for="order in activeOrders" :key="order.id" class="col-12">
         <div class="card shadow-sm order-card"
-        style="cursor: pointer;"
-        @click="goToOrderDetails(order.id)">
+          style="cursor: pointer;"
+          @click="goToOrderDetails(order.id)">
           <div class="card-body">
 
-            <h5 class="fw-bold text-warning">Sipariş ID: #{{ order.id }}</h5>
+            <h5 class="fw-bold text-warning">Order ID: #{{ order.id }}</h5>
 
-            <p class="mb-2"><strong>Toplam Fiyat:</strong> {{ order.totalPrice.toFixed(2) }} ₺</p>
+            <p class="mb-2"><strong>Total Price:</strong> {{ order.totalPrice.toFixed(2) }} ₺</p>
 
-            <p class="mb-2"><strong>Şu Anki Durum:</strong> 
+            <p class="mb-2"><strong>Current Status:</strong> 
               <span class="badge bg-primary">{{ statusText(order.status) }}</span>
             </p>
 
-            <!-- Müşteri Bilgisi -->
+            <!-- Customer Info -->
             <p class="mb-2">
               <i class="bi bi-person-fill text-secondary me-1"></i>
-              <strong>Müşteri:</strong> {{ order.customer.name }} {{ order.customer.surname }}
+              <strong>Customer:</strong> {{ order.customer.name }} {{ order.customer.surname }}
             </p>
             <p class="mb-2">
               <i class="bi bi-house-door-fill text-secondary me-1"></i>
-              <strong>Adres:</strong> {{ order.customer.location }}
+              <strong>Address:</strong> {{ order.customer.location }}
             </p>
 
-            <!-- Kurye İlerleme Çubuğu -->
+            <!-- Courier Progress Bar -->
             <div v-if="order.status === 'ON_THE_WAY'" class="progress my-3" style="height: 20px;">
               <div 
                 class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
@@ -46,7 +46,7 @@
               </div>
             </div>
 
-            <!-- Durum Değiştirme Butonları -->
+            <!-- Status Change Buttons -->
             <div class="d-flex gap-2 mt-3 flex-wrap">
               <button 
                 v-for="status in availableStatuses"
@@ -92,7 +92,7 @@ const fetchOrders = async () => {
       orders.value = response.data.data;
     }
   } catch (error) {
-    console.error('Siparişler yüklenemedi:', error);
+    console.error('Failed to load orders:', error);
   }
 };
 
@@ -109,7 +109,7 @@ const startProgressSimulation = (orderId) => {
       try {
         await axios.put(`/api/progress?orderId=${orderId}&progress=${newProgress}`, {}, { withCredentials: true });
       } catch (error) {
-        console.error('Progress güncellenemedi:', error);
+        console.error('Failed to update progress:', error);
       }
 
       if (newProgress === 100) {
@@ -162,11 +162,11 @@ const updateOrderStatus = (orderId, newStatus) => {
 
 const statusText = (status) => {
   switch (status) {
-    case 'PENDING': return 'Sipariş Alındı';
-    case 'PREPARING': return 'Hazırlanıyor';
-    case 'ON_THE_WAY': return 'Yolda';
-    case 'DELIVERED': return 'Teslim Edildi';
-    case 'CANCELLED': return 'İptal Edildi';
+    case 'PENDING': return 'Order Received';
+    case 'PREPARING': return 'Preparing';
+    case 'ON_THE_WAY': return 'On the Way';
+    case 'DELIVERED': return 'Delivered';
+    case 'CANCELLED': return 'Cancelled';
     default: return status;
   }
 };
