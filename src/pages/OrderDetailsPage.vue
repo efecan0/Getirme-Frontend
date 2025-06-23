@@ -81,6 +81,13 @@
           <h5 class="fw-bold text-warning">Total Price: {{ order.totalPrice.toFixed(2) }} ₺</h5>
         </div>
       </div>
+
+            <RouteMap
+                v-if="routePoints.length"
+                :points="routePoints"
+                :arrive-min="1"     
+              />
+
     </div>
   </template>
   
@@ -89,6 +96,10 @@
   import { useRoute, useRouter } from 'vue-router';
   import axios from 'axios';
   import { connectWebSocket, disconnectWebSocket } from '@/webSocketClient';
+  import RouteMap from '@/components/RouteMap.vue';   // yolu kendine göre düzelt
+
+  const routePoints = ref([]);   // animasyona verilecek dizi
+
 
   const route = useRoute();
   const router = useRouter();
@@ -110,8 +121,18 @@
     try {
       const response = await axios.get(`/api/orderDetails/${orderId}`, { withCredentials: true });
       if (response.data.success) {
+        console.log(response.data.data)
+
         order.value = response.data.data;
         orderStatus.value = order.value.status;
+
+        const body = {
+          address2: response.data.data.customer.location,
+          address1: response.data.data.restaurant.location
+        }
+
+        const response2 = await axios.post(`/api/route`, body, {withCredentials:true});
+        routePoints.value = response2.data.data.points;        
       }
     } catch (error) {
       console.error('Sipariş detayı alınamadı:', error);
