@@ -85,7 +85,8 @@
             <RouteMap
                 v-if="routePoints.length"
                 :points="routePoints"
-                :arrive-min="1"     
+                :arrive-min="arriveTime>0? arriveTime:0.0000001"
+                :orderTime ="order.date"
               />
 
     </div>
@@ -98,6 +99,9 @@
   import { connectWebSocket, disconnectWebSocket } from '@/webSocketClient';
   import RouteMap from '@/components/RouteMap.vue';   // yolu kendine göre düzelt
 
+
+
+
   const routePoints = ref([]);   // animasyona verilecek dizi
 
 
@@ -106,7 +110,7 @@
   const orderId = route.params.orderId;
   const order = ref(null);
   const orderStatus = ref('');
-
+  const arriveTime = Number(route.query.arriveTime);
   
   onMounted(async () => {
     await fetchOrder();

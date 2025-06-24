@@ -168,8 +168,16 @@ const calculateEstimatedDeliveryTime = (distanceKm) => {
 };
 
 const goToOrderDetails = (orderId) => {
-  router.push({ name: 'order-details', params: { orderId } });
+  const order = orders.value.find(o => o.id === orderId);
+  const arriveTime = calculateEstimatedDeliveryTime(order.restaurant.distance);  // dakika cinsinden
+
+  router.push({
+    name: 'order-details',
+    params: { orderId },
+    query: { arriveTime: arriveTime ?? 0 }
+  });
 };
+
 
 const statusText = (status) => {
   switch (status) {

@@ -1,5 +1,4 @@
 <template>
-  <!-- Harita “container”ı. Yüksekliği dilediğin gibi ayarla -->
   <div ref="mapEl" class="w-100" style="height: 400px;"></div>
 </template>
 
@@ -8,138 +7,140 @@ import { ref, onMounted, onBeforeUnmount, watch, defineProps } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-/* ------------- Props ------------- */
+/* -------- props -------- */
 const props = defineProps({
-  points:      { type: Array, required: true },      // [[lat,lon], …]
-  arriveMin:   { type: Number, default: 1 }         // toplam süre (dk)
+  points:    { type: Array,  required: true },           // [[lat,lon],…]
+  arriveMin: { type: Number, default: 1 },               // toplam süre (dk)
+  orderTime: { type: String, required: true }            // ISO 8601
 });
 
-/* ------------- Refs & let’ler ------------- */
-const mapEl  = ref(null);   // DOM düğümü
-let   map, line, courier, timer;   // Leaflet objeleri / setInterval
+/* -------- refs / let -------- */
+const mapEl = ref(null);
+let map, line, courier, timer;
 
-/* ------------- Hayat döngüsü ------------- */
-onMounted(() => init());
+/* -------- lifecycle -------- */
+onMounted(init);
+onBeforeUnmount(destroy);
+watch(() => props.points, () => { destroy(); init(); }, { deep: true });
 
-onBeforeUnmount(() => destroy());
-
-/* ------------- Prop değişince haritayı sıfırla ------------- */
-watch(
-  () => props.points,
-  () => { destroy(); init(); },
-  { deep: true }
-);
-
-/* ------------- Fonksiyonlar ------------- */
-function init() {
+/* -------- init -------- */
+function init () {
   if (!props.points?.length) return;
 
-  /* 1) Harita */
+  /* 1) harita */
   map = L.map(mapEl.value);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap'
-  }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { maxZoom: 19, attribution: '© OpenStreetMap' }
+  ).addTo(map);
 
-  /* 2) Rota çizgisi + fitBounds */
+  /* 2) rota */
   line = L.polyline(props.points, { color: 'steelblue', weight: 4 }).addTo(map);
   map.fitBounds(line.getBounds(), { maxZoom: 14 });
 
-  const startIcon = L.icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9/dist/images/marker-icon.png',
-  iconSize:  [25, 41],
-  iconAnchor:[12, 41],
-  shadowUrl: 'https://unpkg.com/leaflet@1.9/dist/images/marker-shadow.png'
-});
-
-  /* 3) Sabit Başlangıç / Bitiş */
-  L.marker(props.points[0],  { icon: startIcon }).addTo(map).bindPopup('Başlangıç');
-  L.marker(props.points.at(-1), { icon: startIcon  }).addTo(map).bindPopup('Bitiş');
-
-  /* 4) Kask ikonlu kurye */
+  /* 3) ikonlar */
+  const pinIcon = L.icon({
+    iconUrl:  'https://unpkg.com/leaflet@1.9/dist/images/marker-icon.png',
+    iconSize:  [25, 41],
+    iconAnchor:[12, 41],
+    shadowUrl: 'https://unpkg.com/leaflet@1.9/dist/images/marker-shadow.png'
+  });
   const helmetIcon = L.icon({
-    iconUrl:  'https://img.icons8.com/?size=100&id=lSPYEpFCElvV&format=png&color=000000',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
+    iconUrl:   'https://img.icons8.com/?size=100&id=lSPYEpFCElvV&format=png&color=000000',
+    iconSize:  [36, 36],
+    iconAnchor:[18, 18],
     className: 'courier-icon'
   });
-  courier = L.marker(props.points[0], { icon: helmetIcon }).addTo(map);
 
-  /* 5) Animasyon */
-   const totalMs = props.arriveMin * 60_000;
-   console.log(totalMs);
+  L.marker(props.points[0],   { icon: pinIcon }).addTo(map).bindPopup('Başlangıç');
+  L.marker(props.points.at(-1), { icon: pinIcon }).addTo(map).bindPopup('Teslimat');
 
- /* Noktalar arası mesafeler + kümülatif dizi */
- const segLen = [];               // [m,m,…]
- const cumLen = [0];              // [0, m1, m1+m2, …]
- for (let k = 1; k < props.points.length; k++) {
-   segLen[k] = distance(props.points[k - 1], props.points[k]);
-   cumLen[k] = cumLen[k - 1] + segLen[k];
- }
- const total = cumLen.at(-1);     // tüm rota (m)
+  /* 4) mesafe dizileri */
+  const seg = [], cum = [0];
+  for (let i = 1; i < props.points.length; i++) {
+    seg[i] = dist(props.points[i-1], props.points[i]);
+    cum[i] = cum[i-1] + seg[i];
+  }
+  const totalDist = cum.at(-1);
 
- let start;                       // rAF başlangıç zaman damgası
- let prev = props.points[0];
- function step(ts) {
-   if (!start) start = ts;
-   const elapsed = ts - start;            // ms
-   const pct     = Math.min(elapsed / totalMs, 1);   // 0-1
-   const target  = pct * total;            // m
+  /* 5) zaman hesabı */
+  const totalMs   = props.arriveMin * 60_000;
+  const elapsedMs = Date.now() - new Date(props.orderTime).getTime();
+  const pctDone   = Math.min(elapsedMs / totalMs, 1);        // 0-1
+  const travelled = totalDist * pctDone;                     // m
 
-   /* Hangi segment? */
-   let idx = 1;
-   while (idx < cumLen.length && cumLen[idx] < target) idx++;
+  /* 6) o ana dek kat edilen noktayı bul */
+  let k = 1;
+  while (k < cum.length && cum[k] < travelled) k++;
+  const p1 = props.points[k-1], p2 = props.points[k];
+  const localPct = seg[k] ? (travelled - cum[k-1]) / seg[k] : 0;
+  const curLat = p1[0] + (p2[0]-p1[0])*localPct;
+  const curLon = p1[1] + (p2[1]-p1[1])*localPct;
 
-   /* p1-p2 üzerinde ara nokta */
-   const p1 = props.points[idx - 1];
-   const p2 = props.points[idx];
-   const segStart = cumLen[idx - 1];
-   const localPct = (target - segStart) / segLen[idx];
+  /* 7) kurye marker’ı */
+  courier = L.marker([curLat, curLon], { icon: helmetIcon }).addTo(map);
 
-   const lat = p1[0] + (p2[0] - p1[0]) * localPct;
-   const lon = p1[1] + (p2[1] - p1[1]) * localPct;
+  /* sipariş zaten teslimse animasyon yok  */
+  if (pctDone >= 1) return;
 
-   courier.setLatLng([lat, lon]);
-   //const angle = bearing(prev, [lat, lon]);
-   const img   = courier.getElement();
+  /* 8) animasyon */
+  const remainMs   = totalMs   - elapsedMs;
+  const remainDist = totalDist - travelled;
+  let start, prev = [curLat, curLon];
+
+  function step (ts) {
+    if (!start) start = ts;
+    const pct = Math.min((ts - start) / remainMs, 1);          // 0-1
+    const prog = travelled + remainDist * pct;                 // m → toplam yol
+
+    /* hangi segmentteyiz? */
+    let j = 1;
+    while (j < cum.length && cum[j] < prog) j++;
+    const q1 = props.points[j-1], q2 = props.points[j];
+    const loc = seg[j] ? (prog - cum[j-1]) / seg[j] : 0;
+    const lat = q1[0] + (q2[0]-q1[0])*loc;
+    const lon = q1[1] + (q2[1]-q1[1])*loc;
+
+    courier.setLatLng([lat, lon]);
+
+    /* ↺ ikon döndür – translate3d’i bozma! */
+    const img = courier.getElement();
+    if (img) {
    //const base = img.style.transform.replace(/rotate\([^)]*\)/, '').trim();
    img.style.transform = `{${img}} rotate(${bearing(prev, [lat, lon])}deg)`;
-   prev = [lat, lon];
-   line.setLatLngs([[lat, lon], ...props.points.slice(idx)]);
 
-   if (pct < 1) {
-     timer = requestAnimationFrame(step);
-   }
- }
- timer = requestAnimationFrame(step);
+
+
+
+    }
+    prev = [lat, lon];
+
+    line.setLatLngs([[lat, lon], ...props.points.slice(j)]);
+
+    if (pct < 1) timer = requestAnimationFrame(step);
+  }
+  timer = requestAnimationFrame(step);
 }
 
-/* Bearing (derece) */
-function bearing([la1, lo1], [la2, lo2]) {
-  const toRad = d => d * Math.PI / 180;
-  const dLon  = toRad(lo2 - lo1);
-  const y = Math.sin(dLon) * Math.cos(toRad(la2));
-  const x = Math.cos(toRad(la1)) * Math.sin(toRad(la2)) -
-            Math.sin(toRad(la1)) * Math.cos(toRad(la2)) * Math.cos(dLon);
-  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-}
-
-/* Her yeniden başlatmada temizle */
+/* -------- helpers -------- */
 function destroy() {
   if (timer) cancelAnimationFrame(timer);
-  if (map)   map.remove();     // polyline / marker’lar da gider
+  map?.remove();
   map = line = courier = null;
 }
 
-function distance([la1, lo1], [la2, lo2]) {
-  const R = 6371e3;
-  const toRad = d => d * Math.PI / 180;
-  const dφ = toRad(la2 - la1);
-  const dλ = toRad(lo2 - lo1);
-  const φ1 = toRad(la1), φ2 = toRad(la2);
-  const a = Math.sin(dφ/2)**2 +
-            Math.cos(φ1) * Math.cos(φ2) * Math.sin(dλ/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+function dist([la1,lo1],[la2,lo2]) {
+  const R=6371e3, rad=d=>d*Math.PI/180;
+  const dφ=rad(la2-la1), dλ=rad(lo2-lo1);
+  const φ1=rad(la1), φ2=rad(la2);
+  const a=Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function bearing([la1,lo1],[la2,lo2]) {
+  const rad=d=>d*Math.PI/180, dλ=rad(lo2-lo1);
+  const y=Math.sin(dλ)*Math.cos(rad(la2));
+  const x=Math.cos(rad(la1))*Math.sin(rad(la2))-
+          Math.sin(rad(la1))*Math.cos(rad(la2))*Math.cos(dλ);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
 }
 </script>
 
